@@ -9,7 +9,7 @@ class User{
   public function logIn($userName=""){
     try{
       $consulta = $this->access->prepare("CALL spu_user_login(?)");
-      $consulta->execute(array($usernName));
+      $consulta->execute(array($userName));
       return $consulta->fetch(PDO::FETCH_ASSOC);
     }catch(Exception $e){
       die($e->getMessage());
