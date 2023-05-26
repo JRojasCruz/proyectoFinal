@@ -6,13 +6,12 @@ if(isset($_POST['operation'])){
   $user = new User();
   if($_POST['operation']=='login'){
     $access = [
-      "login" => false,
+      		"login" => false,
 			"apellidos" => "",
 			"nombres" => "",
 			"idUsuario" => "",
-			"rol" => ""
+			"rol"=>""
     ];
-
     $data = $user->logIn($_POST['username']);
     $claveingresada = $_POST['password'];
     if ($data) {
@@ -34,10 +33,10 @@ if(isset($_POST['operation'])){
   }
 
 }
-if(isset($_GET['operacion'])){
-	if ($_GET["operacion"] == "logout") {
+if(isset($_GET['operation'])){
+	if ($_GET["operation"] == "logout") {
 		session_destroy();
 		session_unset();
-		header('Location:../Login.php');
+		header('Location:../Index.php');
 	}
 }
