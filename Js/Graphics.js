@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
             labels: carreras,
             datasets: [
               {
-                backgroundColor: ["#2E86C1", "#1D8348"],
+                backgroundColor: ["#EAE186", "#F09D58","#5896F0","#4EA77D"],
                 label: "Postulantes",
                 data: postulantes,
               },
@@ -28,7 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
   }
-
   function graficarMatriculas() {
     const data = new URLSearchParams();
     data.append("operacion", "graficarPagos");

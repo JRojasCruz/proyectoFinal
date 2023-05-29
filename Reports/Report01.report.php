@@ -9,7 +9,7 @@ use Spipu\Html2Pdf\Exception\ExceptionFormatter;
 
 try {
 
-    //Instanciar clase de los matricuales
+    //Instanciar clase de los matriculados
     $superHero = new SuperHero();
     $datos = $superHero->listSuperHero($_GET['publisher_id']);
     $titulo = $_GET['titulo'];

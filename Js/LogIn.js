@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded",()=>{
   const user = document.getElementById("username");
   const password = document.getElementById("password");
   const btLogin = document.getElementById("logIn");
-  const btLogout = document.getElementById("logOut");
   function logIn() {
     const login = new URLSearchParams();
     login.append("operation", "login");
@@ -19,6 +18,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         }
       });
   }
-  btLogin.addEventListener("click", logIn)
+  btLogin.addEventListener("click", logIn);
 })
 

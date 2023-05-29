@@ -9,6 +9,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" />
+
 </head>
 
 <body>
@@ -69,14 +70,14 @@
               <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalMatricula">
                 Registrar nueva matricula
               </button>
-              <!-- Modal -->
-              <div class="modal fade" id="modalMatricula" tabindex="-1" aria-labelledby="exampleModalLabel"
+              <!-- Modal registrar-->
+              <div class="modal fade" id="modalMatricula" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog ">
-                  <div class="modal-content bg-secondary">
+                  <div class="modal-content">
                     <div class="modal-header bg-dark">
                       <h1 class="modal-title fs-5 text-light" id="exampleModalLabel">
-                        REGISTRAR POSTULANTE
+                        REGISTRAR MATRÍCULA
                       </h1>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -109,7 +110,7 @@
                             <div class="form-group row">
                               <label for="tipodoc" class="col-sm-4 col-form-label">T. Documento:</label>
                               <div class="col-sm-8">
-                                <select id="r-tipodoc" name="r-tipodoc" class="form-control" >
+                                <select id="r-tipodoc" name="r-tipodoc" class="form-control">
                                   <option value="">-- Seleccione</option>
                                   <option value="DNI">DNI</option>
                                   <option value="CE">CE</option>
@@ -157,7 +158,7 @@
                             <div class="form-group row">
                               <label for="r-carreras" class="col-sm-4 col-form-label">Carreras:</label>
                               <div class="col-sm-8">
-                                <select id="r-carreras" name="r-carreras" class="form-control">
+                                <select id="r-carreras" name="r-carreras" class="form-select">
                                   <option value="">-- Seleccione</option>
                                   <!-- Agrega más opciones de carrera aquí -->
                                 </select>
@@ -170,7 +171,7 @@
                             <div class="form-group row">
                               <label for="metodopago" class="col-sm-4 col-form-label">Metodo de pago:</label>
                               <div class="col-sm-8">
-                                <select id="r-metodopago" name="r-metodopago" class="form-control">
+                                <select id="r-metodopago" name="r-metodopago" class="form-select">
                                   <option value="">-- Seleccione</option>
                                   <!-- Agrega más opciones de carrera aquí -->
                                 </select>
@@ -178,46 +179,13 @@
                             </div>
                           </div>
                         </div>
-                        <div class="modal-footer bg-dark mt-2">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Cerrar
-                          </button>
-                          <button type="button" class="btn btn-success" id="btnRegistrarMatricula">
-                            Registrar
-                          </button>
-                        </div>
                       </form>
                     </div>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Fin del modal de registrar -->
-          </div>
-          <div class="col-md-4 mb-3 mt-3">
-            <div class="form-floating">
-              <!-- Button trigger modal -->
-              <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalMatricula">
-                Editar matrícula
-              </button>
-              <!-- Modal -->
-              <div class="modal fade" id="modalMatricula" tabindex="-1" aria-labelledby="exampleModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="exampleModalLabel">
-                        EDITAR DATOS DE MATRÍCULA
-                      </h1>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">...</div>
-                    <div class="modal-footer">
+                    <div class="modal-footer bg-dark mt-2">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Cerrar
                       </button>
-                      <button type="button" class="btn btn-primary">
+                      <button type="button" class="btn btn-success" id="btnRegistrarMatricula">
                         Registrar
                       </button>
                     </div>
@@ -225,7 +193,74 @@
                 </div>
               </div>
             </div>
+            <!-- Fin del modal de registrar -->
+
           </div>
+          <div class="col-md-4 mb-3 mt-3">
+            <div class="form-floating">
+              <!-- Boton abrir modal -->
+              <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalRequisitos">
+                Adjuntar requisitos
+              </button>
+              <!--Modal requisitos  -->
+              <div class="modal fade" id="modalRequisitos" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-dark text-light">
+                      <h1 class="modal-title fs-5" id="exampleModalLabel">
+                        ADJUNTAR REQUISITOS
+                      </h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div class="form-group row">
+                            <label for="certestudios" class="col-sm-4 col-form-label">Cert. de Estudios:</label>
+                            <div class="col-sm-8">
+                              <input type="file" class="form-control" id="ar-certestudios" name="ar-certestudios">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row mt-3">
+                        <div class="col-md-12">
+                          <div class="form-group row">
+                            <label for="foto" class="col-sm-4 col-form-label">Foto:</label>
+                            <div class="col-sm-8">
+                              <input type="file" class="form-control" id="ar-foto" name="ar-foto">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row mt-3">
+                        <div class="col-md-12">
+                          <div class="form-group row">
+                            <label for="antpoliciales" class="col-sm-4 col-form-label">Ant. Policiales:</label>
+                            <div class="col-sm-8">
+                              <input type="file" class="form-control" id="ar-antpoliciales" name="ar-antpoliciales">
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer bg-dark">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cerrar
+                      </button>
+                      <button type="button" class="btn btn-primary">
+                        Adjuntar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="col-md-4 mb-3 mt-3">
             <div class="form-floating">
               <!-- Button trigger modal -->
@@ -284,10 +319,11 @@
       </div>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="../Js/Matricula.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
-    crossorigin="anonymous"></script>
+    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous">
+  </script>
 </body>
 
 </html>

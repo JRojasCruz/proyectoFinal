@@ -10,17 +10,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const listarCarreras = document.querySelector("#r-carreras");
   const listarMetodoPago = document.querySelector("#r-metodopago");
   const formRegistrar = document.getElementById("formRegistrarMatricula");
+  const modalRegistrar = new bootstrap.Modal(
+    document.getElementById("modalMatricula")
+  );
   function obtenerMatriculados() {
-    const data = new URLSearchParams();
-    data.append("operacion", "listar");
+    const data = new URLSearchParams(); //Permite manipular y extraer información de los parametros de una url
+    data.append("operacion", "listar"); //Append agrega un nuevo parametro con la clave y valor especificado
     fetch("../Controllers/Matriculas.Controller.php", {
+      //Realizamos la solicitud al servidor
       method: "POST",
       body: data,
     })
-      .then((res) => res.json())
+      .then((res) => res.json()) //Convertimos la respuesta a JSON
       .then((datos) => {
-        tablaMatriculados.innerHTML = ``;
+        tablaMatriculados.innerHTML = ``; //Vacia el contenido para asegurar que se limpie la tb antes de agregar nuevos datos
         datos.forEach((element) => {
+          //Iteramos sobre los datos y generamos una fila en la tabla por cada elemento en datos
           let fila = `
       <tr>
         <td>${element.nroDocumento}</td>
@@ -31,10 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${element.certAntPoliciales}</td>
         <td>${element.estado}</td>
         <td>${element.estadoPago}</td>
-        <td><i class="bi bi-pencil-square" type="button"></i></td>
+        <td><i class="bi bi-currency-dollar" type="button"></i></td>
         </tr>
         `;
-          tablaMatriculados.innerHTML += fila;
+          tablaMatriculados.innerHTML += fila; // Agregamos la fila generada
         });
       });
   }
@@ -72,7 +77,39 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
   }
+  function validarFormulario() {
+    // Obtener los valores de los campos del formulario
+    const nombresvalue = nombres.value;
+    const apellidosvalue = apellidos.value;
+    const tipoDocumentovalue = tipoDocumento.value;
+    const numDocumentovalue = numDocumento.value;
+    const numCelularvalue = numCelular.value;
+    const emailvalue = email.value;
+    const carrerasvalue = listarCarreras.value;
+    const metodopagovalue = listarMetodoPago.value;
+
+    // Realizar validaciones
+    if (
+      !nombresvalue ||
+      !apellidosvalue ||
+      !tipoDocumentovalue ||
+      !numDocumentovalue ||
+      !numCelularvalue ||
+      !emailvalue ||
+      !carrerasvalue ||
+      !metodopagovalue
+    ) {
+      // Verificar que todos los campos estén completos
+      alert("Por favor, complete todos los campos del formulario.");
+      return false; // Los campos no son válidos
+    }
+    return true; // Los campos son válidos
+  }
   function registrarMatricula() {
+    // Validar campos del formulario
+    if (!validarFormulario()) {
+      return; // Detener el proceso de registro si los campos no son válidos
+    }
     if (confirm("¿Estás seguro de registrar la matrícula?")) {
       const fd = new FormData();
       fd.append("operacion", "registrarMatricula");
@@ -94,18 +131,28 @@ document.addEventListener("DOMContentLoaded", () => {
       })
         .then((res) => res.json())
         .then((data) => {
-          if (data.status){
-            document.getElementById("formRegistrarMatricula").reset();
-            formRegistrar.reset();
-          }else{
+          if (data.status) {//Si status es true, se registro exitosamente
+            formRegistrar.reset(); // se reinicia el formulario
+            modalRegistrar.toggle(); //se cierra el modal
+            obtenerMatriculados(); //Se recarga la tabla
+          } else {
             //Error detectado
-            console.log(error)
+            console.log(error);
           }
         })
         .catch((error) => {
           console.error("Error:", error);
         });
     }
+  }
+  function adjuntarRequisitos(){
+    
+  }
+  function eliminarMatricula(){
+    
+  }
+  function pagar(){
+
   }
   btRegistrar.addEventListener("click", registrarMatricula);
   obtenerMatriculados();
