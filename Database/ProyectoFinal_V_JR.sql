@@ -61,9 +61,9 @@ CREATE TABLE Matricula
 (
 	idMatricula			INT AUTO_INCREMENT PRIMARY KEY,
 	idPostulante		INT NOT NULL,
-	certEstudios		VARCHAR(100) NOT NULL DEFAULT 'Pendiente',
+	certEstudios		VARCHAR(100) NULL DEFAULT 'Pendiente',
 	foto				VARCHAR(100) NULL DEFAULT 'Pendiente',
-	certAntPoliciales	VARCHAR(100) NOT NULL DEFAULT 'Pendiente',
+	certAntPoliciales	VARCHAR(100) NULL DEFAULT 'Pendiente',
 	fechaMatricula		DATETIME NULL,
 	estado				CHAR(9) DEFAULT 'Pendiente',
 	CONSTRAINT fk_idPostulante_tMatricula FOREIGN KEY(idPostulante) REFERENCES Postulante(idPostulante),
@@ -72,16 +72,21 @@ CREATE TABLE Matricula
 	CONSTRAINT ck_certAntPoliciales_tMatricula CHECK (certAntPoliciales IN('Pendiente','Recibido')),
 	CONSTRAINT ck_estado_tMatricula CHECK (estado IN('Pendiente','Aceptada'))
 )ENGINE = INNODB;
+
+CREATE TABLE MetodoPago
+(
+	idMetodoPago	INT AUTO_INCREMENT PRIMARY KEY,
+    metodoPago		VARCHAR(40) NOT NULL
+)ENGINE = INNODB;
 -- -----------------------------------------------------------------------------------
 CREATE TABLE Pagos
 (
 	idPago				INT AUTO_INCREMENT PRIMARY KEY,
 	idMatricula			INT NOT NULL,
-	metodoPago			CHAR(8) DEFAULT 'Efectivo',
+	idMetodoPago		INT NOT NULL,
 	fechaPago			DATETIME NULL,
-	montoTotal			DECIMAL(5,2) NOT NULL,
 	estadoPago			CHAR(9) DEFAULT 'Pendiente',
 	CONSTRAINT fk_idMatricula_tPagos FOREIGN KEY (idMatricula) REFERENCES Matricula (idMatricula),
-	CONSTRAINT ck_metodoPago_tPagos CHECK (metodoPago IN ('Efectivo','Deposito','Yape','Plin')),
+    CONSTRAINT fk_idMetodoPago_tPagos FOREIGN KEY (idMetodoPago) REFERENCES MetodoPago (idMetodoPago),
 	CONSTRAINT ck_estadoPago_tPagos CHECK (estadoPago IN('Pendiente','Cancelado'))
 )ENGINE = INNODB;
