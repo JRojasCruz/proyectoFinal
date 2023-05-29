@@ -19,5 +19,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
   }
   btLogin.addEventListener("click", logIn);
+  password.addEventListener("keypress",(e)=>{
+    if(e.key==="Enter") logIn();
+  })
 })
 

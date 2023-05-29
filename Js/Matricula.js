@@ -7,11 +7,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const numCelular = document.getElementById("r-numcel");
   const email = document.getElementById("r-email");
   const btRegistrar = document.getElementById("btnRegistrarMatricula");
+  const btBuscarPostulante = document.getElementById("btnBuscarPostulante");
+  const arnumDoc = document.getElementById("ar-numdocumento");
+  const arPostulante = document.getElementById("ar-Postulante");
   const listarCarreras = document.querySelector("#r-carreras");
   const listarMetodoPago = document.querySelector("#r-metodopago");
   const formRegistrar = document.getElementById("formRegistrarMatricula");
   const modalRegistrar = new bootstrap.Modal(
     document.getElementById("modalMatricula")
+  );
+  const modalPago = new bootstrap.Modal(
+    document.getElementById("modalPago")
   );
   function obtenerMatriculados() {
     const data = new URLSearchParams(); //Permite manipular y extraer información de los parametros de una url
@@ -31,18 +37,25 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${element.nroDocumento}</td>
         <td>${element.nombres} ${element.apellidos}</td>
         <td>${element.nombreCarrera}</td>
-        <td>${element.certEstudios}</td>
-        <td>${element.foto}</td>
-        <td>${element.certAntPoliciales}</td>
+        <td>${element.certEstudiosEstado}</td>
+        <td>${element.fotoEstado}</td>
+        <td>${element.certAntPolicialesEstado}</td>
         <td>${element.estado}</td>
         <td>${element.estadoPago}</td>
-        <td><i class="bi bi-currency-dollar" type="button"></i></td>
+        <td><i class="bi bi-currency-dollar cambiar-estado" type="button"></i></td>
         </tr>
         `;
           tablaMatriculados.innerHTML += fila; // Agregamos la fila generada
         });
       });
   }
+  tablaMatriculados.addEventListener("click", (e)=>{
+    if(
+      e.target.classList.contains('cambiar-estado')
+    ){
+      modalPago.toggle();
+    }
+  })
   function obtenerCarreras() {
     const data = new URLSearchParams();
     data.append("operacion", "listarCarreras");
@@ -145,6 +158,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
   }
+  function buscarPostulante(){
+    const data = new URLSearchParams();
+    data.append("operacion", "buscarPostulante");
+    data.append("ar-numdocumento", arnumDoc.value)
+    fetch("../Controllers/Matriculas.Controller.php", {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((datos) => {
+        console.log(datos)
+        arPostulante.value = datos.nombres + ' ' + datos.apellidos;
+      });
+  }
   function adjuntarRequisitos(){
     
   }
@@ -155,6 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   }
   btRegistrar.addEventListener("click", registrarMatricula);
+  btBuscarPostulante.addEventListener("click", buscarPostulante);
   obtenerMatriculados();
   obtenerCarreras();
   obtenerMetodoPago();

@@ -1,3 +1,4 @@
+-- PROCEDIMIENTO PARA VALIDAR LA SESION DEL USUARIO
 DELIMITER $$
 CREATE PROCEDURE spu_user_login (IN _nombreUsuario VARCHAR(100))
 BEGIN
@@ -8,6 +9,7 @@ SELECT	usuarios.idUsuario, personas.nombres, personas.apellidos,
 		INNER JOIN personas ON personas.idPersona = usuarios.idPersona
 		WHERE nombreUsuario = _nombreUsuario;
 END $$
+
 -- Procedimiento para mostrar las matriculas por carrera
 DELIMITER $$
 CREATE PROCEDURE spu_grafico_carreras()
@@ -19,6 +21,8 @@ SELECT 	carrera.idCarrera,
 		INNER JOIN postulante ON postulante.idCarrera = carrera.idCarrera
 		GROUP BY carrera.idCarrera, carrera.nombreCarrera;
 END $$
+
+-- PROCEDIMIENTO PARA MOSTRAR EL GRAFICO DEL ESTADO DE LOS PAGOS
 DELIMITER $$
 CREATE PROCEDURE spu_grafico_estadopagos()
 BEGIN
@@ -28,19 +32,22 @@ SELECT 	pagos.estadoPago, matricula.idMatricula,
         INNER JOIN matricula ON matricula.idMatricula = pagos.idMatricula
         GROUP BY pagos.estadoPago;
 END$$
+
 -- Procedimiento para listar a los matriculados
 DELIMITER $$
 CREATE PROCEDURE spu_listar_matriculados()
 BEGIN
 SELECT personas.nroDocumento, personas.nombres, personas.apellidos,
-       carrera.nombreCarrera, matricula.certEstudios, matricula.foto, matricula.certAntPoliciales,
+       carrera.nombreCarrera, matricula.certEstudiosEstado, matricula.fotoEstado, matricula.certAntPolicialesEstado,
        matricula.estado, pagos.estadoPago
 FROM matricula
 INNER JOIN postulante ON postulante.idPostulante = matricula.idPostulante
 INNER JOIN personas ON personas.idPersona = postulante.idPersona
 INNER JOIN carrera ON carrera.idCarrera = postulante.idCarrera
-INNER JOIN pagos ON pagos.idPago = matricula.idMatricula;
+INNER JOIN pagos ON pagos.idPago = matricula.idMatricula
+ORDER BY carrera.`nombreCarrera`;
 END$$
+
 -- PROCEDIMIENTO PARA REGISTRAR UNA MATRICULA:
 DELIMITER $$
 CREATE PROCEDURE spu_registrar_matricula(
@@ -82,17 +89,70 @@ BEGIN
 
 END $$
 DELIMITER ;
+-- Probar SPU
+-- CALL spu_registrar_matricula('John', 'Doe', 'DNI', '1234567890', '987654321', 'john.doe@example.com',1,3);
 
-CALL spu_registrar_matricula('John', 'Doe', 'DNI', '1234567890', '987654321', 'john.doe@example.com',1,3);
+-- Procedimiento para registrar los PAGOS
+DROP PROCEDURE IF EXISTS spu_procesar_pago;
+DELIMITER $$
+CREATE PROCEDURE spu_procesar_pago(IN p_nroDocumento INT, IN p_nuevoEstadoPago VARCHAR(50), IN p_nuevoEstadoMatricula VARCHAR(50))
+BEGIN
+    DECLARE v_certEstudiosEstado CHAR(9);
+    DECLARE v_fotoEstado CHAR(9);
+    DECLARE v_certAntPolicialesEstado CHAR(9);
+    
+    SELECT certEstudiosEstado, fotoEstado, certAntPolicialesEstado
+    INTO v_certEstudiosEstado, v_fotoEstado, v_certAntPolicialesEstado
+    FROM Matricula
+    INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
+    INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
+    WHERE Personas.nroDocumento = p_nroDocumento;
+    
+    IF v_certEstudiosEstado = 'Recibido' AND v_fotoEstado = 'Recibido' AND v_certAntPolicialesEstado = 'Recibido' THEN
+        UPDATE Pagos
+        INNER JOIN Matricula ON Pagos.idMatricula = Matricula.idMatricula
+        INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
+        INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
+        SET Pagos.estadoPago = p_nuevoEstadoPago,
+            Matricula.estado = p_nuevoEstadoMatricula
+        WHERE Personas.nroDocumento = p_nroDocumento;
+        
+        IF p_nuevoEstadoPago = 'Cancelado' THEN
+            UPDATE Matricula
+            INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
+            INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
+            SET Matricula.estado = 'Aceptada'
+            WHERE Personas.nroDocumento = p_nroDocumento;
+        END IF;
+    ELSE
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se puede procesar el pago. Los documentos no están en estado "Recibido".';
+    END IF;
+END$$
+DELIMITER ;
+-- Probar SPU
+-- CALL spu_procesar_pago('75869241','Cancelado','Aceptada');
 
-select * from personas;
-select * from postulante;
-select * from matricula;
-call spu_listar_matriculados;
-select * from pagos;
-delete from postulante where idPostulante= 7;
-delete from matricula where idMatricula= 5;
-delete from personas where idPersona= 6;
+-- PROCEDIMIENTO PARA BUSCAR EL POSTULANTE
+DELIMITER $$
+CREATE PROCEDURE spu_buscar_postulante(IN p_nroDocumento CHAR(12))
+BEGIN
+    SELECT p.nombres, p.apellidos
+    FROM Personas p
+    INNER JOIN Postulante po ON p.idPersona = po.idPersona
+    WHERE p.nroDocumento = p_nroDocumento;
+END$$
+DELIMITER ;
+-- PROBAR SPU
+CALL spu_buscar_postulante(21859644);
+
+SELECT * FROM personas;
+SELECT * FROM postulante;
+SELECT * FROM matricula;
+CALL spu_listar_matriculados;
+SELECT * FROM pagos;
+DELETE FROM postulante WHERE idPostulante= 7;
+DELETE FROM matricula WHERE idMatricula= 5;
+DELETE FROM personas WHERE idPersona= 6;
 
 
 

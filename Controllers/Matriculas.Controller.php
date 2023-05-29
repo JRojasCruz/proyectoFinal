@@ -42,4 +42,10 @@ if (isset($_POST['operacion'])) {
 
     echo json_encode($respuesta);
   }
+  if ($_POST['operacion'] == 'buscarPostulante') {
+    $datos = $matriculados->buscarPostulante($_POST['ar-numdocumento']);
+    if ($datos) {
+      echo json_encode($datos);
+    }
+  }
 }

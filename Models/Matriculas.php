@@ -55,6 +55,15 @@ class Matriculados{
         return false;
       }
     }
+    public function buscarPostulante($numDocumento){
+      try{
+        $consulta = $this->access->prepare("CALL spu_buscar_postulante(?)");
+        $consulta->execute(array(($numDocumento)));
+        return $consulta->fetch(PDO::FETCH_ASSOC);
+      }catch(Exception $e){
+        die($e->getMessage());
+      }
+    }
 
   }
   ?>

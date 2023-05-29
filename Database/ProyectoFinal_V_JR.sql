@@ -59,17 +59,20 @@ CREATE TABLE Postulante
 -- -----------------------------------------------------------------------------------
 CREATE TABLE Matricula
 (
-	idMatricula			INT AUTO_INCREMENT PRIMARY KEY,
-	idPostulante		INT NOT NULL,
-	certEstudios		VARCHAR(100) NULL DEFAULT 'Pendiente',
-	foto				VARCHAR(100) NULL DEFAULT 'Pendiente',
-	certAntPoliciales	VARCHAR(100) NULL DEFAULT 'Pendiente',
-	fechaMatricula		DATETIME NULL,
-	estado				CHAR(9) DEFAULT 'Pendiente',
+	idMatricula					INT AUTO_INCREMENT PRIMARY KEY,
+	idPostulante				INT NOT NULL,
+	certEstudios				VARCHAR(100) NULL,
+	foto							VARCHAR(100) NULL,
+	certAntPoliciales			VARCHAR(100) NULL,
+	certEstudiosEstado		CHAR(9) NULL DEFAULT 'Pendiente',
+	fotoEstado					CHAR(9) NULL DEFAULT 'Pendiente',
+	certAntPolicialesEstado	CHAR(9) NULL DEFAULT 'Pendiente',
+	fechaMatricula				DATETIME NULL,
+	estado						CHAR(9) DEFAULT 'Pendiente',
 	CONSTRAINT fk_idPostulante_tMatricula FOREIGN KEY(idPostulante) REFERENCES Postulante(idPostulante),
-	CONSTRAINT ck_foto_tMatricula CHECK (foto IN('Pendiente','Recibido')),
-	CONSTRAINT ck_certEstudios_tMatricula CHECK (certEstudios IN('Pendiente','Recibido')),
-	CONSTRAINT ck_certAntPoliciales_tMatricula CHECK (certAntPoliciales IN('Pendiente','Recibido')),
+	CONSTRAINT ck_fotoEstado_tMatricula CHECK (fotoEstado IN('Pendiente','Recibido')),
+	CONSTRAINT ck_certEstudiosEstado_tMatricula CHECK (certEstudiosEstado IN('Pendiente','Recibido')),
+	CONSTRAINT ck_certAntPolicialesEstado_tMatricula CHECK (certAntPolicialesEstado IN('Pendiente','Recibido')),
 	CONSTRAINT ck_estado_tMatricula CHECK (estado IN('Pendiente','Aceptada'))
 )ENGINE = INNODB;
 

@@ -14,8 +14,8 @@ SELECT * FROM usuarios;
 
 -- Insercion de Carreras
 INSERT INTO Carrera		(nombreCarrera, descripcion, precioInscripcion, duracion,semestres,cuotasPorSemestre,precioPorCuota)
-			VALUES 		('Ingeniería de Software', 'El profesional técnico en Ingenieria de Software con Inteligencia Artificial está capacitado,para aplicar principios, técnicas, herramientas y métodos para el diseño, desarrollo, implementación, mantenimiento ,y gestión de sistemas de información con Inteligencia Artificial', 450, '3 años',6,4,308),
-                        ('Mecánico automotriz', 'El profesional técnico en Mecánica Automotriz está capacitado para conducir, con autonomía, un puesto de trabajo en función a las exigencias técnicas y de calidad de servicio en el sector automotriz, teniendo en cuenta los aspectos ambientales, de seguridad y de salud.', 560, '3 años',6,4,498),
+			VALUES 	('Ingeniería de Software', 'El profesional técnico en Ingenieria de Software con Inteligencia Artificial está capacitado,para aplicar principios, técnicas, herramientas y métodos para el diseño, desarrollo, implementación, mantenimiento ,y gestión de sistemas de información con Inteligencia Artificial', 450, '3 años',6,4,308),
+                  ('Mecánico automotriz', 'El profesional técnico en Mecánica Automotriz está capacitado para conducir, con autonomía, un puesto de trabajo en función a las exigencias técnicas y de calidad de servicio en el sector automotriz, teniendo en cuenta los aspectos ambientales, de seguridad y de salud.', 560, '3 años',6,4,498),
 						('Arquitectura', 'Enfoque en el diseño y construcción de espacios habitables, considerando aspectos estéticos, funcionales y estructurales.', 600, '5 años', 10, 8, 550),
 						('Ingeniería Industrial', 'Aplicación de principios científicos y matemáticos para diseñar, mejorar y optimizar sistemas de producción y operaciones.', 700, '4 años', 8, 6, 650),
 						('Administración de Empresas', 'Gestión eficiente de recursos y liderazgo en organizaciones, tomando decisiones estratégicas para alcanzar objetivos empresariales.', 550, '4 años', 8, 6, 500),
@@ -37,7 +37,7 @@ INSERT INTO Postulante (idPersona, idCarrera)
 SELECT * FROM Postulante;
 
 INSERT INTO Matricula 	(idPostulante, certEstudios,certAntPoliciales, fechaMatricula)
-			VALUES 	(1,'Pendiente', 'Pendiente', now()),
+			VALUES 	(1,'Pendiente', 'Pendiente', NOW()),
 					(2,'Pendiente', 'Pendiente', now()),
                     (3,'Pendiente', 'Pendiente', now());
 SELECT * FROM Matricula;
