@@ -9,17 +9,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const btRegistrar = document.getElementById("btnRegistrarMatricula");
   const btBuscarPostulante = document.getElementById("btnBuscarPostulante");
   const btAdjuntarRequisitos = document.getElementById("btnAdjuntarRequisitos");
+  const btnProcesarPago = document.getElementById("btnProcesarPago");
+  let   numDocumentoPago = null;
   const arnumDoc = document.getElementById("ar-numdocumento");
-  const arPostulante = document.getElementById("ar-Postulante");
+  const arPostulante = document.getElementById("ar-postulante");
+  const arCertestudios = document.getElementById("ar-certestudios");
+  const arFoto = document.getElementById("ar-foto");
+  const antPoliciales = document.getElementById("ar-antpoliciales");
   const listarCarreras = document.querySelector("#r-carreras");
   const listarMetodoPago = document.querySelector("#r-metodopago");
   const formRegistrar = document.getElementById("formRegistrarMatricula");
+  const formAdjuntarRequisitos = document.getElementById(
+    "formAdjuntarRequisitos"
+  );
   const modalRegistrar = new bootstrap.Modal(
     document.getElementById("modalMatricula")
   );
-  const modalPago = new bootstrap.Modal(
-    document.getElementById("modalPago")
+  const modalRequisitos = new bootstrap.Modal(
+    document.getElementById("modalRequisitos")
   );
+  const modalPago = new bootstrap.Modal(document.getElementById("modalPago"));
+
   function obtenerMatriculados() {
     const data = new URLSearchParams(); //Permite manipular y extraer información de los parametros de una url
     data.append("operacion", "listar"); //Append agrega un nuevo parametro con la clave y valor especificado
@@ -32,6 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((datos) => {
         tablaMatriculados.innerHTML = ``; //Vacia el contenido para asegurar que se limpie la tb antes de agregar nuevos datos
         datos.forEach((element) => {
+          const validarEstados = [
+            element.certEstudiosEstado,
+            element.fotoEstado,
+            element.certAntPolicialesEstado
+          ].every(estado=>estado=='Recibido');
           //Iteramos sobre los datos y generamos una fila en la tabla por cada elemento en datos
           let fila = `
       <tr>
@@ -43,20 +58,21 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${element.certAntPolicialesEstado}</td>
         <td>${element.estado}</td>
         <td>${element.estadoPago}</td>
-        <td><i class="bi bi-currency-dollar cambiar-estado" type="button"></i></td>
+        <td><button class="cambiar-estado" data-dni='${element.nroDocumento}' disabled><i class="bi bi-currency-dollar"></i></button></td>
         </tr>
         `;
           tablaMatriculados.innerHTML += fila; // Agregamos la fila generada
         });
       });
   }
-  tablaMatriculados.addEventListener("click", (e)=>{
-    if(
-      e.target.classList.contains('cambiar-estado')
-    ){
+  tablaMatriculados.addEventListener("click", (e) => {
+    const btCambiarEstado = e.target.closest(".cambiar-estado");
+    if (btCambiarEstado) {
+      numDocumentoPago = e.target.dataset.dni;
+      console.log(numDocumentoPago)
       modalPago.toggle();
     }
-  })
+  });
   function obtenerCarreras() {
     const data = new URLSearchParams();
     data.append("operacion", "listarCarreras");
@@ -145,7 +161,8 @@ document.addEventListener("DOMContentLoaded", () => {
       })
         .then((res) => res.json())
         .then((data) => {
-          if (data.status) {//Si status es true, se registro exitosamente
+          if (data.status) {
+            //Si status es true, se registro exitosamente
             formRegistrar.reset(); // se reinicia el formulario
             modalRegistrar.toggle(); //se cierra el modal
             obtenerMatriculados(); //Se recarga la tabla
@@ -159,10 +176,65 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
   }
-  function buscarPostulante(){
+  function buscarPostulante() {
     const data = new URLSearchParams();
     data.append("operacion", "buscarPostulante");
-    data.append("ar-numdocumento", arnumDoc.value)
+    data.append("ar-numdocumento", arnumDoc.value);
+    fetch("../Controllers/Matriculas.Controller.php", {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((datos) => {
+        console.log(datos);
+        arPostulante.value = datos.nombres + " " + datos.apellidos;
+      });
+  }
+  function validarFormularioRequisitos() {
+    const arCertestudiosValue = arCertestudios.value;
+    const arFotoValue = arFoto.value;
+    const antPolicialesValue = antPoliciales.value;
+    if (!arCertestudiosValue || !arFotoValue || !antPolicialesValue) {
+      // Verificar que todos los campos estén completos
+      alert("Por favor, complete todos los campos del formulario.");
+      return false; // Los campos no son válidos
+    }
+    return true; // Los campos son válidos
+  }
+  function adjuntarRequisitos() {
+    if (!validarFormularioRequisitos()) {
+      return; // Detener el proceso de registro si los campos no son válidos
+    }
+    const data = new FormData();
+    data.append("operacion", "adjuntarRequisitos");
+    data.append("ar-numdocumento", arnumDoc.value);
+    data.append("ar-certestudios", arCertestudios.files[0]);
+    data.append("ar-foto", arFoto.files[0]);
+    data.append("ar-antpoliciales", antPoliciales.files[0]);
+    fetch("../Controllers/Requisitos.Controller.php", {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((datos) => {
+        if (datos.status) {
+          formAdjuntarRequisitos.reset();
+          modalRequisitos.toggle();
+          obtenerMatriculados();
+        } else {
+          console.log(error);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+  function eliminarMatricula() {}
+
+  function pagar() {
+    const data = new FormData();
+    data.append("operacion", "procesarPago");
+    data.append("ar-numdocumento", numDocumentoPago);
     fetch("../Controllers/Matriculas.Controller.php", {
       method: "POST",
       body: data,
@@ -170,33 +242,15 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((res) => res.json())
       .then((datos) => {
         console.log(datos)
-        arPostulante.value = datos.nombres + ' ' + datos.apellidos;
+        numDocumentoPago = null;
       });
   }
-  function adjuntarRequisitos(){
-    const data = new URLSearchParams();
-    data.append("operacion", "adjuntarRequisitos");
-    data.append("", arnumDoc.value)
-    fetch("../Controllers/Requisitos.Controller.php", {
-      method: "POST",
-      body: data,
-    })
-      .then((res) => res.json())
-      .then((datos) => {
-        console.log(datos)
-        
-      });
-  }
-  function eliminarMatricula(){
-    
-  }
-  function pagar(){
 
-  }
-  
   btRegistrar.addEventListener("click", registrarMatricula);
   btBuscarPostulante.addEventListener("click", buscarPostulante);
   btAdjuntarRequisitos.addEventListener("click", adjuntarRequisitos);
+  btnProcesarPago.addEventListener("click", pagar);
+
   obtenerMatriculados();
   obtenerCarreras();
   obtenerMetodoPago();

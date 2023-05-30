@@ -36,10 +36,10 @@ INSERT INTO Postulante (idPersona, idCarrera)
                 
 SELECT * FROM Postulante;
 
-INSERT INTO Matricula 	(idPostulante, certEstudios,certAntPoliciales, fechaMatricula)
-			VALUES 	(1,'Pendiente', 'Pendiente', NOW()),
-					(2,'Pendiente', 'Pendiente', now()),
-                    (3,'Pendiente', 'Pendiente', now());
+INSERT INTO Matricula 	(idPostulante, fechaMatricula)
+			VALUES 	(1,NOW()),
+					(2,NOW()),
+                    (3,NOW());
 SELECT * FROM Matricula;
 
 INSERT INTO MetodoPago (idMetodoPago, metodoPago)
@@ -47,7 +47,7 @@ VALUES (1, 'Yape'),
        (2, 'Efectivo'),
        (3, 'Plin'),
        (4, 'Transferencia');
-select * from metodopago;
+SELECT * FROM metodopago;
 INSERT INTO Pagos(idMatricula,idMetodoPago)
 			VALUES		(1,1),
 						(2,3),

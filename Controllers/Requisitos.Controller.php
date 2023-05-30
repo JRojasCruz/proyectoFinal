@@ -12,17 +12,15 @@ if (isset($_POST['operacion'])) {
     }
   }
   if ($_POST['operacion'] == 'adjuntarRequisitos') {
-    var_dump($_POST);
-    $urlCert = $fileHelper->uploadFile("certEstudios",'.pdf');
-    $urlPhoto = $fileHelper->uploadFile("foto",'.jpg');
-    $urlAntP = $fileHelper->uploadFile("antPoliciales",'.pdf');
+    $urlCert = $fileHelper->uploadFile("ar-certestudios",'.pdf');
+    $urlPhoto = $fileHelper->uploadFile("ar-foto",'.jpg');
+    $urlAntP = $fileHelper->uploadFile("ar-antpoliciales",'.pdf');
     $datos = [
       "nroDocumento" => $_POST['ar-numdocumento'],
       "certEstudios" => $urlCert,
       "foto" => $urlPhoto,
       "certAntPoliciales" => $urlAntP
     ];
-
     $data = [
       "status" => false
     ];

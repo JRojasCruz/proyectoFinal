@@ -48,4 +48,10 @@ if (isset($_POST['operacion'])) {
       echo json_encode($datos);
     }
   }
+  if ($_POST['operacion'] == 'procesarPago') {
+    $datos = $matriculados->procesarPagos($_POST['ar-numdocumento']);
+    if ($datos) {
+      echo json_encode($datos);
+    }
+  }
 }

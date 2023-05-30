@@ -235,7 +235,7 @@
                             <div class="form-group row">
                               <label for="foto" class="col-sm-4 col-form-label">Postulante:</label>
                               <div class="col-sm-8">
-                                <input type="input" class="form-control" id="ar-Postulante" name="ar-Postulante"
+                                <input type="input" class="form-control" id="ar-postulante" name="ar-postulante"
                                   readonly>
                               </div>
                             </div>
@@ -294,7 +294,7 @@
             <div class="form-floating">
               <!-- Boton abrir modal -->
               <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalEliminar">
-                Adjuntar requisitos
+                Eliminar matrícula
               </button>
               <!--Modal   -->
               <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -362,24 +362,13 @@
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                      <div class="row">
-                        <div class="col-md-12">
-                          <div class="form-group row">
-                            <div class="input-group mb-3">
-                              <input type="text" class="form-control" placeholder="Ingresa el número de documento"
-                                aria-label="Recipient's username" aria-describedby="button-addon2">
-                              <button class="btn btn-outline-secondary" type="button" id="button-addon2"><i
-                                  class="bi bi-search"></i></button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      ¿Está seguro de procesar el pago?
                     </div>
                     <div class="modal-footer bg-dark">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Cerrar
                       </button>
-                      <button type="button" class="btn btn-primary">
+                      <button type="button" class="btn btn-primary" id="btnProcesarPago">
                         Pagar
                       </button>
                     </div>

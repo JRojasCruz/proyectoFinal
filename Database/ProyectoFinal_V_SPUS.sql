@@ -95,11 +95,12 @@ DELIMITER ;
 -- Procedimiento para registrar los PAGOS
 DROP PROCEDURE IF EXISTS spu_procesar_pago;
 DELIMITER $$
-CREATE PROCEDURE spu_procesar_pago(IN p_nroDocumento INT, IN p_nuevoEstadoPago VARCHAR(50), IN p_nuevoEstadoMatricula VARCHAR(50))
+CREATE PROCEDURE spu_procesar_pago(IN p_nroDocumento INT)
 BEGIN
     DECLARE v_certEstudiosEstado CHAR(9);
     DECLARE v_fotoEstado CHAR(9);
     DECLARE v_certAntPolicialesEstado CHAR(9);
+    DECLARE mensaje VARCHAR(50);
     
     SELECT certEstudiosEstado, fotoEstado, certAntPolicialesEstado
     INTO v_certEstudiosEstado, v_fotoEstado, v_certAntPolicialesEstado
@@ -113,25 +114,23 @@ BEGIN
         INNER JOIN Matricula ON Pagos.idMatricula = Matricula.idMatricula
         INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
         INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
-        SET Pagos.estadoPago = p_nuevoEstadoPago,
-            Matricula.estado = p_nuevoEstadoMatricula
+        SET Pagos.estadoPago = 'Cancelado' ,
+            Matricula.estado = 'Aceptada' 
         WHERE Personas.nroDocumento = p_nroDocumento;
         
-        IF p_nuevoEstadoPago = 'Cancelado' THEN
+        IF Pagos.estadoPago = 'Cancelado' THEN
             UPDATE Matricula
             INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
             INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
             SET Matricula.estado = 'Aceptada'
             WHERE Personas.nroDocumento = p_nroDocumento;
         END IF;
-    ELSE
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se puede procesar el pago. Los documentos no están en estado "Recibido".';
     END IF;
 END$$
 DELIMITER ;
 -- Probar SPU
--- CALL spu_procesar_pago('75869241','Cancelado','Aceptada');
-
+CALL spu_procesar_pago('75869241');
+SELECT * FROM Pagos;
 -- PROCEDIMIENTO PARA BUSCAR EL POSTULANTE
 DELIMITER $$
 CREATE PROCEDURE spu_buscar_postulante(IN p_nroDocumento CHAR(12))
@@ -182,7 +181,7 @@ CALL spu_adjuntar_requisitos(84956833,'hola','adios','chao');
 
 
 
-select * from matricula;
+SELECT * FROM matricula;
 
 
 
