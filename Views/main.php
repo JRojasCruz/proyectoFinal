@@ -38,9 +38,18 @@ if (!isset($_SESSION["seguridad"]) || !$_SESSION["seguridad"]["login"]) {
           <li class="nav-item">
             <a class="nav-link" href="matricula.php"><i class="bi bi-card-checklist"></i> Matriculas</a>
           </li>
-          <li class="nav-item ">
-            <a class="nav-link" href="reportes.html"><i class="bi bi-filetype-pdf"></i> Reportes</a>
-          </li>
+          <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                data-bs-toggle="dropdown"
+                href=""
+                ><i class="bi bi-filetype-pdf"></i> Reportes</a
+              >
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="./reportepdf1.php">Reporte PDF 1</a></li>
+                <li><a class="dropdown-item" href="./reportepdf2.php">Reporte PDF 2</a></li>
+              </ul>
+            </li>
         </ul>
 
         <hr class="d-md-none text-white-50">

@@ -64,6 +64,15 @@ class Matriculados{
         die($e->getMessage());
       }
     }
+    public function eliminarMatricula($numDocumento){
+      try{
+        $consulta = $this->access->prepare("CALL spu_eliminar_matricual(?)");
+        $consulta->execute(array(($numDocumento)));
+        return $consulta->fetch(PDO::FETCH_ASSOC);
+      }catch(Exception $e){
+        die($e->getMessage());
+      }
+    }
     public function procesarPagos($numDocumento){
       try{
         $consulta = $this->access->prepare("CALL spu_procesar_pago(?)");

@@ -8,11 +8,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const email = document.getElementById("r-email");
   const btRegistrar = document.getElementById("btnRegistrarMatricula");
   const btBuscarPostulante = document.getElementById("btnBuscarPostulante");
+  const btBuscarEliminarPostulante = document.getElementById("em-buscarPostulante");
   const btAdjuntarRequisitos = document.getElementById("btnAdjuntarRequisitos");
   const btnProcesarPago = document.getElementById("btnProcesarPago");
-  let   numDocumentoPago = null;
+  const btEliminarMatricula = document.getElementById("btnEliminarMatricula");
+  let numDocumentoPago = null;
   const arnumDoc = document.getElementById("ar-numdocumento");
   const arPostulante = document.getElementById("ar-postulante");
+  const emnumDoc = document.getElementById("em-nrodocumento");
+  const emPostulante = document.getElementById("em-Postulante");
   const arCertestudios = document.getElementById("ar-certestudios");
   const arFoto = document.getElementById("ar-foto");
   const antPoliciales = document.getElementById("ar-antpoliciales");
@@ -28,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalRequisitos = new bootstrap.Modal(
     document.getElementById("modalRequisitos")
   );
+  const modalEliminar = new bootstrap.Modal(document.getElementById("modalEliminar"));
   const modalPago = new bootstrap.Modal(document.getElementById("modalPago"));
 
   function obtenerMatriculados() {
@@ -45,8 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
           const validarEstados = [
             element.certEstudiosEstado,
             element.fotoEstado,
-            element.certAntPolicialesEstado
-          ].every(estado=>estado=='Recibido');
+            element.certAntPolicialesEstado,
+          ].every((estado) => estado == "Recibido");
+          const validarEstadoPago = element.estadoPago !== "Cancelado" && validarEstados;
+          console.log(validarEstadoPago)
           //Iteramos sobre los datos y generamos una fila en la tabla por cada elemento en datos
           let fila = `
       <tr>
@@ -58,8 +65,13 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${element.certAntPolicialesEstado}</td>
         <td>${element.estado}</td>
         <td>${element.estadoPago}</td>
-        <td><button class="cambiar-estado" data-dni='${element.nroDocumento}' disabled><i class="bi bi-currency-dollar"></i></button></td>
+        <td>
+          <button><i class="bi bi-trash"></i></button>
+          <button><i class="bi bi-file-earmark-zip"></i></button>
+          <button class="cambiar-estado" data-dni='${element.nroDocumento}' ${!validarEstadoPago ? "disabled" : ""}><i class="bi bi-currency-dollar"></i></button>
+          </td>
         </tr>
+        
         `;
           tablaMatriculados.innerHTML += fila; // Agregamos la fila generada
         });
@@ -67,10 +79,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   tablaMatriculados.addEventListener("click", (e) => {
     const btCambiarEstado = e.target.closest(".cambiar-estado");
+
     if (btCambiarEstado) {
-      numDocumentoPago = e.target.dataset.dni;
-      console.log(numDocumentoPago)
-      modalPago.toggle();
+      console.log(btCambiarEstado.disabled);
+      if (!btCambiarEstado.disabled) {
+        modalPago.toggle();
+        numDocumentoPago = btCambiarEstado.dataset.dni;
+        console.log(numDocumentoPago);
+      }
     }
   });
   function obtenerCarreras() {
@@ -176,18 +192,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
   }
-  function buscarPostulante() {
+  function buscarPostulante(dni,input) {
     const data = new URLSearchParams();
     data.append("operacion", "buscarPostulante");
-    data.append("ar-numdocumento", arnumDoc.value);
+    data.append("ar-numdocumento", dni);
     fetch("../Controllers/Matriculas.Controller.php", {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
       .then((datos) => {
-        console.log(datos);
-        arPostulante.value = datos.nombres + " " + datos.apellidos;
+        input.value = datos.nombres + " " + datos.apellidos;
       });
   }
   function validarFormularioRequisitos() {
@@ -222,14 +237,31 @@ document.addEventListener("DOMContentLoaded", () => {
           modalRequisitos.toggle();
           obtenerMatriculados();
         } else {
-          console.log(error);
+          console.log("Holis");
         }
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   }
-  function eliminarMatricula() {}
+  function eliminarMatricula() {
+    if(confirm("¿Estás seguro de eliminar ésta matrícula?")){
+    const data = new URLSearchParams();
+    data.append("operacion", "eliminarMatricula");
+    data.append("em-numdocumento", emnumDoc.value);
+    fetch("../Controllers/Matriculas.Controller.php", {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((datos) => {
+        console.log(datos)
+        formEliminarMatricula.reset();
+        obtenerMatriculados();
+        modalEliminar.toggle();
+      });
+    }
+  }
 
   function pagar() {
     const data = new FormData();
@@ -241,15 +273,22 @@ document.addEventListener("DOMContentLoaded", () => {
     })
       .then((res) => res.json())
       .then((datos) => {
-        console.log(datos)
         numDocumentoPago = null;
+        modalPago.toggle();
+        obtenerMatriculados();
       });
   }
 
   btRegistrar.addEventListener("click", registrarMatricula);
-  btBuscarPostulante.addEventListener("click", buscarPostulante);
+  btBuscarPostulante.addEventListener("click", ()=>{
+    buscarPostulante(arnumDoc.value,arPostulante);
+  });
+  btBuscarEliminarPostulante.addEventListener("click",()=>{
+    buscarPostulante(emnumDoc.value,emPostulante);
+  });
   btAdjuntarRequisitos.addEventListener("click", adjuntarRequisitos);
   btnProcesarPago.addEventListener("click", pagar);
+  btEliminarMatricula.addEventListener("click", eliminarMatricula);
 
   obtenerMatriculados();
   obtenerCarreras();

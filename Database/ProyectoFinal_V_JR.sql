@@ -73,7 +73,7 @@ CREATE TABLE Matricula
 	CONSTRAINT ck_fotoEstado_tMatricula CHECK (fotoEstado IN('Pendiente','Recibido')),
 	CONSTRAINT ck_certEstudiosEstado_tMatricula CHECK (certEstudiosEstado IN('Pendiente','Recibido')),
 	CONSTRAINT ck_certAntPolicialesEstado_tMatricula CHECK (certAntPolicialesEstado IN('Pendiente','Recibido')),
-	CONSTRAINT ck_estado_tMatricula CHECK (estado IN('Pendiente','Aceptada'))
+	CONSTRAINT ck_estado_tMatricula CHECK (estado IN('Pendiente','Aceptada','Invalida'))
 )ENGINE = INNODB;
 
 CREATE TABLE MetodoPago

@@ -15,11 +15,13 @@ DELIMITER $$
 CREATE PROCEDURE spu_grafico_carreras()
 BEGIN
 SELECT 	carrera.idCarrera,
-		carrera.nombreCarrera,
-		COUNT(postulante.idPostulante) AS 'Postulantes'
-	FROM carrera
-		INNER JOIN postulante ON postulante.idCarrera = carrera.idCarrera
-		GROUP BY carrera.idCarrera, carrera.nombreCarrera;
+			carrera.nombreCarrera,
+			COUNT(postulante.idPostulante) AS 'Postulantes'
+		FROM carrera
+			INNER JOIN postulante ON postulante.idCarrera = carrera.idCarrera
+			INNER JOIN matricula ON postulante.idPostulante = matricula.idPostulante
+			WHERE matricula.estado IN('Pendiente', 'Aceptada')
+			GROUP BY carrera.idCarrera, carrera.nombreCarrera;
 END $$
 
 -- PROCEDIMIENTO PARA MOSTRAR EL GRAFICO DEL ESTADO DE LOS PAGOS
@@ -27,25 +29,26 @@ DELIMITER $$
 CREATE PROCEDURE spu_grafico_estadopagos()
 BEGIN
 SELECT 	pagos.estadoPago, matricula.idMatricula,
-		COUNT(pagos.estadoPago) AS 'Pagos'
+			COUNT(pagos.estadoPago) AS 'Pagos'
         FROM pagos
         INNER JOIN matricula ON matricula.idMatricula = pagos.idMatricula
+        WHERE matricula.estado IN('Pendiente', 'Aceptada')
         GROUP BY pagos.estadoPago;
 END$$
-
 -- Procedimiento para listar a los matriculados
 DELIMITER $$
 CREATE PROCEDURE spu_listar_matriculados()
 BEGIN
 SELECT personas.nroDocumento, personas.nombres, personas.apellidos,
        carrera.nombreCarrera, matricula.certEstudiosEstado, matricula.fotoEstado, matricula.certAntPolicialesEstado,
-       matricula.estado, pagos.estadoPago
+       matricula.estado, matricula.fechaMatricula,pagos.estadoPago
 FROM matricula
 INNER JOIN postulante ON postulante.idPostulante = matricula.idPostulante
 INNER JOIN personas ON personas.idPersona = postulante.idPersona
 INNER JOIN carrera ON carrera.idCarrera = postulante.idCarrera
 INNER JOIN pagos ON pagos.idPago = matricula.idMatricula
-ORDER BY carrera.`nombreCarrera`;
+WHERE matricula.estado IN ('Pendiente', 'Aceptada')
+ORDER BY matricula.`fechaMatricula`;
 END$$
 
 -- PROCEDIMIENTO PARA REGISTRAR UNA MATRICULA:
@@ -92,45 +95,6 @@ DELIMITER ;
 -- Probar SPU
 -- CALL spu_registrar_matricula('John', 'Doe', 'DNI', '1234567890', '987654321', 'john.doe@example.com',1,3);
 
--- Procedimiento para registrar los PAGOS
-DROP PROCEDURE IF EXISTS spu_procesar_pago;
-DELIMITER $$
-CREATE PROCEDURE spu_procesar_pago(IN p_nroDocumento INT)
-BEGIN
-    DECLARE v_certEstudiosEstado CHAR(9);
-    DECLARE v_fotoEstado CHAR(9);
-    DECLARE v_certAntPolicialesEstado CHAR(9);
-    DECLARE mensaje VARCHAR(50);
-    
-    SELECT certEstudiosEstado, fotoEstado, certAntPolicialesEstado
-    INTO v_certEstudiosEstado, v_fotoEstado, v_certAntPolicialesEstado
-    FROM Matricula
-    INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
-    INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
-    WHERE Personas.nroDocumento = p_nroDocumento;
-    
-    IF v_certEstudiosEstado = 'Recibido' AND v_fotoEstado = 'Recibido' AND v_certAntPolicialesEstado = 'Recibido' THEN
-        UPDATE Pagos
-        INNER JOIN Matricula ON Pagos.idMatricula = Matricula.idMatricula
-        INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
-        INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
-        SET Pagos.estadoPago = 'Cancelado' ,
-            Matricula.estado = 'Aceptada' 
-        WHERE Personas.nroDocumento = p_nroDocumento;
-        
-        IF Pagos.estadoPago = 'Cancelado' THEN
-            UPDATE Matricula
-            INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
-            INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
-            SET Matricula.estado = 'Aceptada'
-            WHERE Personas.nroDocumento = p_nroDocumento;
-        END IF;
-    END IF;
-END$$
-DELIMITER ;
--- Probar SPU
-CALL spu_procesar_pago('75869241');
-SELECT * FROM Pagos;
 -- PROCEDIMIENTO PARA BUSCAR EL POSTULANTE
 DELIMITER $$
 CREATE PROCEDURE spu_buscar_postulante(IN p_nroDocumento CHAR(12))
@@ -141,8 +105,6 @@ BEGIN
     WHERE p.nroDocumento = p_nroDocumento;
 END$$
 DELIMITER ;
--- PROBAR SPU
-CALL spu_buscar_postulante(21859644);
 
 -- PROCEDIMIENTO PARA ACTULIZAR LOS REQUISITOS Y SUS ESTADOS
 DELIMITER $$
@@ -175,13 +137,86 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
-CALL spu_adjuntar_requisitos(84956833,'hola','adios','chao');
 
 
+-- Procedimiento para registrar los PAGOS
+DROP PROCEDURE IF EXISTS spu_procesar_pago;
+DELIMITER $$
+CREATE PROCEDURE spu_procesar_pago(IN p_nroDocumento INT)
+BEGIN
+    DECLARE uno CHAR(9);
+    DECLARE dos CHAR(9);
+    DECLARE tres CHAR(9);
 
+    SELECT certEstudiosEstado, fotoEstado, certAntPolicialesEstado
+    INTO uno, dos, tres
+    FROM Matricula
+    INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
+    INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
+    WHERE Personas.nroDocumento = p_nroDocumento;
 
+    IF uno = 'Recibido' AND dos = 'Recibido' AND tres = 'Recibido' THEN
+        UPDATE Pagos
+        INNER JOIN Matricula ON Pagos.idMatricula = Matricula.idMatricula
+        INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
+        INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
+        SET Pagos.estadoPago = 'Cancelado',
+            Pagos.fechaPago = NOW()
+        WHERE Personas.nroDocumento = p_nroDocumento;
 
+        IF ROW_COUNT() > 0 THEN
+            UPDATE Matricula
+            INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
+            INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
+            SET Matricula.estado = 'Aceptada'
+            WHERE Personas.nroDocumento = p_nroDocumento;
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
+
+-- ELIMINAR MATRÍCULA POR IDMATRICULA
+DELIMITER $$
+CREATE PROCEDURE spu_eliminar_matricual(IN p_nroDocumento INT)
+BEGIN
+	UPDATE Matricula
+		INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
+		INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
+		SET Matricula.estado = 'Invalida'
+		WHERE Personas.nroDocumento = p_nroDocumento;
+
+END$$
+
+-- Probar SPU
+CALL spu_procesar_pago('98765432');
+CALL spu_eliminar_matricual('85296374');
+SELECT * FROM Pagos;
 SELECT * FROM matricula;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

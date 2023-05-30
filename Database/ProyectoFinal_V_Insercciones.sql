@@ -3,7 +3,17 @@ INSERT INTO Personas (nombres, apellidos, tipoDocumento, nroDocumento, nroCelula
 VALUES	('Jesus','Rojas', 'DNI','74036049','902336311','jesus.rojas.cm@gmail.com'),
 		('Olivia','Casas', 'DNI','84956833','956529630','olivia@gmail.com'),
 		('Luis','Puma', 'DNI','21859644','958741029','luis@gmail.com'),
-		('Matias','Pomalagua', 'DNI','75869241','945812063','matias@gmail.com');
+		('Matias','Pomalagua', 'DNI','75869241','945812063','matias@gmail.com'),
+		('Carlos', 'González', 'DNI', '45678912', '987654321', 'carlos@example.com'),
+		('María', 'López', 'DNI', '12345678', '555555555', 'maria@example.com'),
+		('Juan', 'Martínez', 'DNI', '98765432', '123456789', 'juan@example.com'),
+		('Laura', 'Gómez', 'DNI', '65432198', '999999999', 'laura@example.com'),
+		('Pedro', 'Sánchez', 'DNI', '78945612', '111111111', 'pedro@example.com'),
+		('Ana', 'Rodríguez', 'DNI', '85296374', '444444444', 'ana@example.com'),
+		('Luis', 'Hernández', 'DNI', '36985214', '888888888', 'luis@example.com'),
+		('Marta', 'Fernández', 'DNI', '14785236', '222222222', 'marta@example.com'),
+		('Alejandro', 'Torres', 'DNI', '96325874', '666666666', 'alejandro@example.com'),
+		('Sofía', 'Pérez', 'DNI', '25896314', '333333333', 'sofia@example.com');
         
 SELECT * FROM personas;
 -- Inserción de Usuarios
@@ -31,15 +41,27 @@ SELECT * FROM Carrera;
 -- Inserción de Postulantes
 INSERT INTO Postulante (idPersona, idCarrera) 
 		VALUES 	(2,1),
-				(3,2),
-                (4,2);
+					(3,2),
+               (4,3),
+               (5,4),
+               (6,5),
+               (7,6),
+               (8,7),
+               (9,8),
+               (10,9);
                 
 SELECT * FROM Postulante;
 
 INSERT INTO Matricula 	(idPostulante, fechaMatricula)
-			VALUES 	(1,NOW()),
-					(2,NOW()),
-                    (3,NOW());
+			VALUES 		(1,NOW()),
+							(2,NOW()),
+							(3,NOW()),
+							(4,NOW()),
+							(5,NOW()),
+							(6,NOW()),
+							(7,NOW()),
+							(8,NOW()),
+							(9,NOW());
 SELECT * FROM Matricula;
 
 INSERT INTO MetodoPago (idMetodoPago, metodoPago)
@@ -50,7 +72,13 @@ VALUES (1, 'Yape'),
 SELECT * FROM metodopago;
 INSERT INTO Pagos(idMatricula,idMetodoPago)
 			VALUES		(1,1),
-						(2,3),
-						(3,4);
+							(2,3),
+							(3,2),
+							(4,3),
+							(5,1),
+							(6,4),
+							(7,3),
+							(8,1),
+							(9,2);
 SELECT * FROM Pagos;
 
