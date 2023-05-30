@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const email = document.getElementById("r-email");
   const btRegistrar = document.getElementById("btnRegistrarMatricula");
   const btBuscarPostulante = document.getElementById("btnBuscarPostulante");
+  const btAdjuntarRequisitos = document.getElementById("btnAdjuntarRequisitos");
   const arnumDoc = document.getElementById("ar-numdocumento");
   const arPostulante = document.getElementById("ar-Postulante");
   const listarCarreras = document.querySelector("#r-carreras");
@@ -173,7 +174,18 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
   function adjuntarRequisitos(){
-    
+    const data = new URLSearchParams();
+    data.append("operacion", "adjuntarRequisitos");
+    data.append("", arnumDoc.value)
+    fetch("../Controllers/Requisitos.Controller.php", {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((datos) => {
+        console.log(datos)
+        
+      });
   }
   function eliminarMatricula(){
     
@@ -181,8 +193,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function pagar(){
 
   }
+  
   btRegistrar.addEventListener("click", registrarMatricula);
   btBuscarPostulante.addEventListener("click", buscarPostulante);
+  btAdjuntarRequisitos.addEventListener("click", adjuntarRequisitos);
   obtenerMatriculados();
   obtenerCarreras();
   obtenerMetodoPago();

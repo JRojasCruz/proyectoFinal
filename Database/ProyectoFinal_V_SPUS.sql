@@ -145,21 +145,44 @@ DELIMITER ;
 -- PROBAR SPU
 CALL spu_buscar_postulante(21859644);
 
-SELECT * FROM personas;
-SELECT * FROM postulante;
-SELECT * FROM matricula;
-CALL spu_listar_matriculados;
-SELECT * FROM pagos;
-DELETE FROM postulante WHERE idPostulante= 7;
-DELETE FROM matricula WHERE idMatricula= 5;
-DELETE FROM personas WHERE idPersona= 6;
+-- PROCEDIMIENTO PARA ACTULIZAR LOS REQUISITOS Y SUS ESTADOS
+DELIMITER $$
+CREATE PROCEDURE spu_adjuntar_requisitos(
+    IN p_numero_documento CHAR(12),
+    IN p_cert_estudios VARCHAR(100),
+    IN p_foto VARCHAR(100),
+    IN p_cert_ant_policiales VARCHAR(100)
+)
+BEGIN
+    DECLARE v_id_matricula INT;
+
+    -- Obtener el idMatricula basado en el número de documento del postulante
+    SELECT m.idMatricula INTO v_id_matricula
+    FROM Matricula m
+    INNER JOIN Postulante p ON m.idPostulante = p.idPostulante
+    INNER JOIN Personas pe ON p.idPersona = pe.idPersona
+    WHERE pe.nroDocumento = p_numero_documento;
+
+    IF v_id_matricula IS NOT NULL THEN
+        -- Actualizar los requisitos adjuntados
+        UPDATE Matricula
+        SET certEstudios = p_cert_estudios,
+            foto = p_foto,
+            certAntPoliciales = p_cert_ant_policiales,
+            certEstudiosEstado = 'Recibido',
+            fotoEstado = 'Recibido',
+            certAntPolicialesEstado = 'Recibido'
+        WHERE idMatricula = v_id_matricula;
+    END IF;
+END$$
+DELIMITER ;
+CALL spu_adjuntar_requisitos(84956833,'hola','adios','chao');
 
 
 
 
 
-
-
+select * from matricula;
 
 
 

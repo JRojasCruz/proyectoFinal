@@ -216,66 +216,69 @@
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                      <div class="row">
-                        <div class="col-md-12">
-                          <div class="form-group row">
-                            <div class="input-group mb-3">
-                              <input type="text" class="form-control" id="ar-numdocumento" name="ar-numdocumento" placeholder="Ingresa el número de documento"
-                                aria-label="Recipient's username" aria-describedby="button-addon2">
-                              <button class="btn btn-outline-secondary" type="button" id="btnBuscarPostulante"><i
-                                  class="bi bi-search"></i></button>
+                      <form action="" autocomplete="off" id="formAdjuntarRequisitos" name="formAdjuntarRequisitos">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group row">
+                              <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="ar-numdocumento" name="ar-numdocumento"
+                                  placeholder="Ingresa el número de documento" aria-label="Recipient's username"
+                                  aria-describedby="button-addon2">
+                                <button class="btn btn-outline-secondary" type="button" id="btnBuscarPostulante"><i
+                                    class="bi bi-search"></i></button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div class="row mt-3">
-                        <div class="col-md-12">
-                          <div class="form-group row">
-                            <label for="foto" class="col-sm-4 col-form-label">Postulante:</label>
-                            <div class="col-sm-8">
-                              <input type="input" class="form-control" id="ar-Postulante" name="ar-Postulante" readonly>
+                        <div class="row mt-3">
+                          <div class="col-md-12">
+                            <div class="form-group row">
+                              <label for="foto" class="col-sm-4 col-form-label">Postulante:</label>
+                              <div class="col-sm-8">
+                                <input type="input" class="form-control" id="ar-Postulante" name="ar-Postulante"
+                                  readonly>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div class="row mt-3">
-                        <div class="col-md-12">
-                          <div class="form-group row">
-                            <label for="foto" class="col-sm-4 col-form-label">Cert. Estudios:</label>
-                            <div class="col-sm-8">
-                              <input type="file" class="form-control" id="ar-certestudios" name="ar-certestudios">
+                        <div class="row mt-3">
+                          <div class="col-md-12">
+                            <div class="form-group row">
+                              <label for="foto" class="col-sm-4 col-form-label">Cert. Estudios:</label>
+                              <div class="col-sm-8">
+                                <input type="file" class="form-control" id="ar-certestudios" name="ar-certestudios" accept=".pdf">
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div class="row mt-3">
-                        <div class="col-md-12">
-                          <div class="form-group row">
-                            <label for="foto" class="col-sm-4 col-form-label">Foto:</label>
-                            <div class="col-sm-8">
-                              <input type="file" class="form-control" id="ar-foto" name="ar-foto">
+                        <div class="row mt-3">
+                          <div class="col-md-12">
+                            <div class="form-group row">
+                              <label for="foto" class="col-sm-4 col-form-label">Foto:</label>
+                              <div class="col-sm-8">
+                                <input type="file" class="form-control" id="ar-foto" name="ar-foto" accept="image/jpg">
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-
-                      <div class="row mt-3">
-                        <div class="col-md-12">
-                          <div class="form-group row">
-                            <label for="antpoliciales" class="col-sm-4 col-form-label">Ant. Policiales:</label>
-                            <div class="col-sm-8">
-                              <input type="file" class="form-control" id="ar-antpoliciales" name="ar-antpoliciales">
-                              </select>
+                        <div class="row mt-3">
+                          <div class="col-md-12">
+                            <div class="form-group row">
+                              <label for="antpoliciales" class="col-sm-4 col-form-label">Ant. Policiales:</label>
+                              <div class="col-sm-8">
+                                <input type="file" class="form-control" id="ar-antpoliciales" name="ar-antpoliciales" accept=".pdf">
+                                </select>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </form>
                     </div>
                     <div class="modal-footer bg-dark">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Cerrar
                       </button>
-                      <button type="button" class="btn btn-primary">
+                      <button type="button" class="btn btn-primary" id="btnAdjuntarRequisitos">
                         Adjuntar
                       </button>
                     </div>
@@ -293,7 +296,7 @@
               <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalEliminar">
                 Adjuntar requisitos
               </button>
-              <!--Modal requisitos  -->
+              <!--Modal   -->
               <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -344,10 +347,10 @@
           </div>
           <!-- Fin modal eliminar matrícula -->
 
-          <!-- Modal eliminar matrícula -->
+          <!-- Modal procesar pagos -->
           <div class="col-md-4 mb-3 mt-3">
             <div class="form-floating">
-              <!--Modal requisitos  -->
+              <!--Modal -->
               <div class="modal fade" id="modalPago" tabindex="-1" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -385,7 +388,7 @@
               </div>
             </div>
           </div>
-          <!-- Fin modal eliminar matrícula -->
+          <!-- Fin modal procesar pagos -->
 
         </div>
       </div>
@@ -418,7 +421,7 @@
   <script src="../Js/Matricula.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous">
-  </script>
+    </script>
 </body>
 
 </html>
