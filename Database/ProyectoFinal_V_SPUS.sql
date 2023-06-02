@@ -39,7 +39,7 @@ END$$
 DELIMITER $$
 CREATE PROCEDURE spu_listar_matriculados()
 BEGIN
-SELECT personas.nroDocumento, personas.nombres, personas.apellidos,
+SELECT matricula.idMatricula,personas.nroDocumento, personas.nombres, personas.apellidos,
        carrera.nombreCarrera, matricula.certEstudiosEstado, matricula.fotoEstado, matricula.certAntPolicialesEstado,
        matricula.estado, matricula.fechaMatricula,pagos.estadoPago
 FROM matricula
@@ -48,10 +48,10 @@ INNER JOIN personas ON personas.idPersona = postulante.idPersona
 INNER JOIN carrera ON carrera.idCarrera = postulante.idCarrera
 INNER JOIN pagos ON pagos.idPago = matricula.idMatricula
 WHERE matricula.estado IN ('Pendiente', 'Aceptada')
-ORDER BY matricula.`fechaMatricula`;
+ORDER BY matricula.idMatricula DESC;
 END$$
 
--- PROCEDIMIENTO PARA REGISTRAR UNA MATRICULA:
+
 DELIMITER $$
 CREATE PROCEDURE spu_registrar_matricula(
     IN p_nombres VARCHAR(70),
@@ -67,31 +67,63 @@ BEGIN
     DECLARE p_idPersona INT;
     DECLARE p_idPostulante INT;
     DECLARE p_idMatricula INT;
+    DECLARE p_result INT;
+    DECLARE p_resultExists INT;
+    -- Verificar si la persona ya existe en la tabla Personas
+    SELECT idPersona INTO p_idPersona FROM Personas WHERE nroDocumento = p_nroDocumento LIMIT 1;
+    IF p_idPersona IS NULL THEN
+        -- La persona no existe, insertar en la tabla Personas
+        INSERT INTO Personas (nombres, apellidos, tipoDocumento, nroDocumento, nroCelular, email)
+        VALUES (p_nombres, p_apellidos, p_tipoDocumento, p_nroDocumento, p_nroCelular, p_email);
 
-    -- Insertar en la tabla Personas
-    INSERT INTO Personas (nombres, apellidos, tipoDocumento, nroDocumento, nroCelular, email)
-    VALUES (p_nombres, p_apellidos, p_tipoDocumento, p_nroDocumento, p_nroCelular, p_email);
-
-    SET p_idPersona = LAST_INSERT_ID();
-
-    -- Insertar en la tabla Postulante
-    INSERT INTO Postulante (idPersona, idCarrera, fechaPostulacion)
-    VALUES (p_idPersona, p_idCarrera, NOW());
-
-    SET p_idPostulante = LAST_INSERT_ID();
-
-    -- Insertar en la tabla Matricula
-    INSERT INTO Matricula (idPostulante, fechaMatricula)
-    VALUES (p_idPostulante, NOW());
-
-    SET p_idMatricula = LAST_INSERT_ID();
-
-    -- Insertar en la tabla Pagos
-    INSERT INTO Pagos (idMatricula, idMetodoPago, fechaPago, estadoPago)
-    VALUES (p_idMatricula, p_idMetodoPago, NOW(), 'Pendiente');
-
+        SET p_idPersona = LAST_INSERT_ID();
+    END IF;
+    -- Verificar si la persona ha alcanzado el límite de carreras permitidas
+    SELECT COUNT(*) INTO p_result FROM Postulante WHERE idPersona = p_idPersona AND estado='Activo';
+    IF p_result < 2 THEN
+    -- Verificar si la persona ya esta matricula en una misma carrera
+    SELECT COUNT(*) INTO p_resultExists FROM matricula
+		INNER JOIN postulante on postulante.idPostulante = matricula.idPostulante
+		INNER JOIN personas on personas.idPersona = postulante.idPersona
+		WHERE personas.nroDocumento = p_nroDocumento AND postulante.idCarrera = p_idCarrera AND matricula.estado='Pendiente';
+        IF p_resultExists < 1 THEN
+        -- Insertar en la tabla Postulante
+        INSERT INTO Postulante (idPersona, idCarrera, fechaPostulacion)
+        VALUES (p_idPersona, p_idCarrera, NOW());
+        SET p_idPostulante = LAST_INSERT_ID();
+        -- Insertar en la tabla Matricula
+        INSERT INTO Matricula (idPostulante, fechaMatricula)
+        VALUES (p_idPostulante, NOW());
+        SET p_idMatricula = LAST_INSERT_ID();
+        -- Insertar en la tabla Pagos
+        INSERT INTO Pagos (idMatricula, idMetodoPago, estadoPago)
+        VALUES (p_idMatricula, p_idMetodoPago, 'Pendiente');
+		END IF;
+    END IF;
 END $$
 DELIMITER ;
+
+SELECT COUNT(*) AS result FROM Postulante WHERE idPersona = 16;
+SELECT COUNT(*) AS resultMatricula FROM Postulante WHERE idPersona = 2;
+CALL spu_registrar_matricula('Carlos', 'Moran', 'DNI', '111520003', '981111111', 'carlos@gmail.com',1,4);
+select * from postulante;
+select * from personas;
+select *
+from matricula
+inner join postulante on postulante.idPostulante = matricula.idPostulante
+inner join personas on personas.idPersona = postulante.idPersona
+where personas.nroDocumento = 111520003;
+
+
+select COUNT(*) as num
+from matricula
+inner join postulante on postulante.idPostulante = matricula.idPostulante
+inner join personas on personas.idPersona = postulante.idPersona
+where personas.nroDocumento = '111520003' AND postulante.idCarrera = 10 AND matricula.estado="Invalida";
+select * from pagos;
+
+
+
 -- Probar SPU
 -- CALL spu_registrar_matricula('John', 'Doe', 'DNI', '1234567890', '987654321', 'john.doe@example.com',1,3);
 
@@ -109,23 +141,12 @@ DELIMITER ;
 -- PROCEDIMIENTO PARA ACTULIZAR LOS REQUISITOS Y SUS ESTADOS
 DELIMITER $$
 CREATE PROCEDURE spu_adjuntar_requisitos(
-    IN p_numero_documento CHAR(12),
+    IN p_idMatricula INT,
     IN p_cert_estudios VARCHAR(100),
     IN p_foto VARCHAR(100),
     IN p_cert_ant_policiales VARCHAR(100)
 )
 BEGIN
-    DECLARE v_id_matricula INT;
-
-    -- Obtener el idMatricula basado en el número de documento del postulante
-    SELECT m.idMatricula INTO v_id_matricula
-    FROM Matricula m
-    INNER JOIN Postulante p ON m.idPostulante = p.idPostulante
-    INNER JOIN Personas pe ON p.idPersona = pe.idPersona
-    WHERE pe.nroDocumento = p_numero_documento;
-
-    IF v_id_matricula IS NOT NULL THEN
-        -- Actualizar los requisitos adjuntados
         UPDATE Matricula
         SET certEstudios = p_cert_estudios,
             foto = p_foto,
@@ -133,8 +154,7 @@ BEGIN
             certEstudiosEstado = 'Recibido',
             fotoEstado = 'Recibido',
             certAntPolicialesEstado = 'Recibido'
-        WHERE idMatricula = v_id_matricula;
-    END IF;
+        WHERE idMatricula = p_idMatricula;
 END$$
 DELIMITER ;
 
@@ -177,21 +197,36 @@ DELIMITER ;
 
 -- ELIMINAR MATRÍCULA POR IDMATRICULA
 DELIMITER $$
-CREATE PROCEDURE spu_eliminar_matricual(IN p_nroDocumento INT)
+CREATE PROCEDURE spu_eliminar_matricula(IN _idMatricula INT)
 BEGIN
 	UPDATE Matricula
-		INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
-		INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
-		SET Matricula.estado = 'Invalida'
-		WHERE Personas.nroDocumento = p_nroDocumento;
-
+		INNER JOIN Postulante ON postulante.idPostulante = matricula.idPostulante
+        INNER JOIN Pagos ON pagos.idMatricula = matricula.idMatricula 
+		SET matricula.estado = 'Anulada', postulante.estado = 'Inactivo', pagos.estadoPago = 'Anulado'
+		WHERE Matricula.idMatricula = _idMatricula;
 END$$
 
+UPDATE Matricula SET estado = 'Pendiente' where idMatricula IN(15,16);
+select * from postulante;
+-- REPORTES PDF 1
+DELIMITER $$
+CREATE PROCEDURE spu_listar_matriculas_por_carrera(IN _idCarrera INT)
+BEGIN 
+	SELECT carrera.idCarrera, carrera.nombreCarrera,personas.nombres, personas.apellidos,matricula.estado,pagos.estadoPago
+	FROM matricula
+		INNER JOIN postulante ON postulante.idPostulante = matricula.idPostulante
+		INNER JOIN personas ON personas.idPersona = postulante.idPersona
+		INNER JOIN carrera ON carrera.idCarrera = postulante.idCarrera
+		INNER JOIN pagos ON pagos.idPago = matricula.idMatricula
+		WHERE carrera.idCarrera = _idCarrera
+		ORDER BY personas.nombres;
+END$$
 -- Probar SPU
 CALL spu_procesar_pago('98765432');
 CALL spu_eliminar_matricual('85296374');
-SELECT * FROM Pagos;
+SELECT * FROM postulante;
 SELECT * FROM matricula;
+SELECT * FROM Pagos;
 
 
 

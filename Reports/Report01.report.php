@@ -1,7 +1,7 @@
 <?php
 
 require_once '../vendor/autoload.php';
-require_once '../model/SuperHero.model.php'; //Modelo de los matriculados aqui
+require_once '../Models/Reportes.php'; //Modelo de los matriculados aqui
 
 use Spipu\Html2Pdf\Html2Pdf;
 use Spipu\Html2Pdf\Exception\Html2PdfException;
@@ -10,9 +10,9 @@ use Spipu\Html2Pdf\Exception\ExceptionFormatter;
 try {
 
     //Instanciar clase de los matriculados
-    $superHero = new SuperHero();
-    $datos = $superHero->listSuperHero($_GET['publisher_id']);
-    $titulo = $_GET['titulo'];
+    $Reportes = new Reportes();
+    $datos = $Reportes->listarMatriculadosPorCarrera($_GET['idCarrera']);
+    $titulo = $_GET['nombreCarrera'];
 
     ob_start();
     //Hoja de estilos
@@ -26,7 +26,6 @@ try {
     $html2pdf->output('Matriculados.pdf');
 } catch (Html2PdfException $e) {
     $html2pdf->clean();
-
     $formatter = new ExceptionFormatter($e);
     echo $formatter->getHtmlMessage();
 }

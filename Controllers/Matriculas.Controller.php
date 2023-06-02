@@ -22,7 +22,7 @@ if (isset($_POST['operacion'])) {
     }
   }
   if ($_POST['operacion'] == 'registrarMatricula'){
-    //Capturar los datos
+    // Capturar los datos
     $datosGuardar = [
       "nombres"           => $_POST['r-nombres'],
       "apellidos"         => $_POST['r-apellidos'],
@@ -32,16 +32,19 @@ if (isset($_POST['operacion'])) {
       "email"             => $_POST['r-email'],
       "idCarrera"         => $_POST['r-carreras'],
       "idMetodoPago"      => $_POST['r-metodopago']
-
     ];
+    
+    // Llamar a la función para registrar la matrícula y obtener el resultado
+    $resultado = $matriculados->registrarMatricula($datosGuardar);
+
+    // Preparar la respuesta JSON
     $respuesta = [
-      "status"=> false
-    ];
-
-    $respuesta["status"] = $matriculados->registrarMatricula($datosGuardar);
-
+      "status" => ($resultado === 0), // Establecer el estado según el resultado
+      "errorCode" => ($resultado === 1 ? 1 : 0) // Agregar el código de error si es necesario // Establecer el estado según el resultado
+  ];
     echo json_encode($respuesta);
-  }
+}
+
   if ($_POST['operacion'] == 'buscarPostulante') {
     $datos = $matriculados->buscarPostulante($_POST['ar-numdocumento']);
     if ($datos) {
@@ -49,7 +52,7 @@ if (isset($_POST['operacion'])) {
     }
   }
   if ($_POST['operacion'] == 'eliminarMatricula') {
-    $datos = $matriculados->eliminarMatricula($_POST['em-numdocumento']);
+    $datos = $matriculados->eliminarMatricula($_POST['idMatricula']);
       echo json_encode($datos);
   }
   if ($_POST['operacion'] == 'procesarPago') {

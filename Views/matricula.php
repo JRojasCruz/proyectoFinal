@@ -1,3 +1,9 @@
+<?php
+session_start();
+if (!isset($_SESSION["seguridad"]) || !$_SESSION["seguridad"]["login"]) {
+  header("Location:../Index.php");
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -92,12 +98,12 @@
       <!-- Formulario filtro -->
       <div class="card">
         <div class="card-header bg-dark text-light">
-          Registra o edita una matrícula
+          Sistema de registro de matrículas
         </div>
-        <div class="card-body text-center">
+        <div class="card-body">
           <div class="row">
             <!-- Modal registrar-->
-            <div class="col-md-4 mb-3 mt-3">
+            <div class="col-md-8">
               <div class="form-floating">
                 <!-- Button registrar modal -->
                 <button
@@ -108,7 +114,6 @@
                 >
                   Registrar nueva matricula
                 </button>
-
                 <div
                   class="modal fade"
                   id="modalMatricula"
@@ -328,20 +333,25 @@
                 </div>
               </div>
             </div>
+            <div class="col-md-4">
+            <div class="form-floating text-end">
+              USUARIO:
+            <?php
+                if (isset($_SESSION["seguridad"]) && $_SESSION["seguridad"]["login"]) {
+						    $nombreUsuario = $_SESSION["seguridad"]["nombres"] . ' ' . $_SESSION["seguridad"]["apellidos"];
+						    echo '<button type="button"
+                class="btn btn-dark">' .
+                $nombreUsuario . ' 
+                </button>';
+                }
+                ?>
+              </div>
+              </div>
             <!-- Fin del modal de registrar -->
-
             <!-- Modal adjuntar requisitos -->
-            <div class="col-md-4 mb-3 mt-3">
+            <div class="">
               <div class="form-floating">
                 <!-- Boton abrir modal -->
-                <button
-                  type="button"
-                  class="btn btn-dark"
-                  data-bs-toggle="modal"
-                  data-bs-target="#modalRequisitos"
-                >
-                  Adjuntar requisitos
-                </button>
                 <!--Modal requisitos  -->
                 <div
                   class="modal fade"
@@ -373,44 +383,6 @@
                           <div class="row">
                             <div class="col-md-12">
                               <div class="form-group row">
-                                <div class="input-group mb-3">
-                                  <input
-                                    type="text"
-                                    class="form-control"
-                                    id="ar-numdocumento"
-                                    name="ar-numdocumento"
-                                    placeholder="Ingresa el número de documento"
-                                    aria-label="Recipient's username"
-                                    aria-describedby="button-addon2"
-                                  />
-                                  <button
-                                    class="btn btn-outline-secondary"
-                                    type="button"
-                                    id="btnBuscarPostulante"
-                                  >
-                                    <i class="bi bi-search"></i>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="row mt-3">
-                            <div class="col-md-12">
-                              <div class="form-group row">
-                                <label
-                                  for="foto"
-                                  class="col-sm-4 col-form-label"
-                                  >Postulante:</label
-                                >
-                                <div class="col-sm-8">
-                                  <input
-                                    type="input"
-                                    class="form-control"
-                                    id="ar-postulante"
-                                    name="ar-postulante"
-                                    readonly
-                                  />
-                                </div>
                               </div>
                             </div>
                           </div>
@@ -500,20 +472,11 @@
             <!-- Fin modal adjuntar requisitos -->
 
             <!-- Modal eliminar matrícula -->
-            <div class="col-md-4 mb-3 mt-3">
+            <div class="">
               <div class="form-floating">
-                <!-- Boton abrir modal -->
-                <button
-                  type="button"
-                  class="btn btn-dark"
-                  data-bs-toggle="modal"
-                  data-bs-target="#modalEliminar"
-                >
-                  Eliminar matrícula
-                </button>
                 <!--Modal   -->
                 <div
-                  class="modal fade"
+                  class="modal fade modal-sm"
                   id="modalEliminar"
                   tabindex="-1"
                   aria-labelledby="exampleModalLabel"
@@ -533,50 +496,7 @@
                         ></button>
                       </div>
                       <div class="modal-body">
-                        <form action="" id="formEliminarMatricula" autocomplete="off">
-                        <div class="row">
-                          <div class="col-md-12">
-                            <div class="form-group row">
-                              <div class="input-group mb-3">
-                                <input
-                                  type="text"
-                                  class="form-control"
-                                  placeholder="Ingresa el número de documento"
-                                  id="em-nrodocumento"
-                                  name="em-nrodocumento"
-                                  aria-label="Recipient's username"
-                                  aria-describedby="button-addon2"
-                                />
-                                <button
-                                  class="btn btn-outline-secondary"
-                                  type="button"
-                                  id="em-buscarPostulante"
-                                >
-                                  <i class="bi bi-search"></i>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row mt-3">
-                          <div class="col-md-12">
-                            <div class="form-group row">
-                              <label for="foto" class="col-sm-4 col-form-label"
-                                >Postulante:</label
-                              >
-                              <div class="col-sm-8">
-                                <input
-                                  type="input"
-                                  class="form-control"
-                                  id="em-Postulante"
-                                  name="em-Postulante"
-                                  readonly
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </form>
+                        ¿Está seguro de eliminar la matrícula?
                       </div>
                       <div class="modal-footer bg-dark">
                         <button
@@ -602,7 +522,7 @@
             <!-- Fin modal eliminar matrícula -->
 
             <!-- Modal procesar pagos -->
-            <div class="col-md-4 mb-3 mt-3">
+            <div class="">
               <div class="form-floating">
                 <!--Modal -->
                 <div

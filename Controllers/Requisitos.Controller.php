@@ -16,7 +16,7 @@ if (isset($_POST['operacion'])) {
     $urlPhoto = $fileHelper->uploadFile("ar-foto",'.jpg');
     $urlAntP = $fileHelper->uploadFile("ar-antpoliciales",'.pdf');
     $datos = [
-      "nroDocumento" => $_POST['ar-numdocumento'],
+      "idMatricula" => $_POST['idMatricula'],
       "certEstudios" => $urlCert,
       "foto" => $urlPhoto,
       "certAntPoliciales" => $urlAntP

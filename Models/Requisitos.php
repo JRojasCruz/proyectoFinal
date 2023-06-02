@@ -11,7 +11,7 @@ class Requisitos{
         // Ejecutar el procedimiento almacenado
         $consulta = $this->access->prepare("CALL spu_adjuntar_requisitos(?,?,?,?)");
         $consulta->execute(array(
-            $datos["nroDocumento"],
+            $datos["idMatricula"],
             $datos["certEstudios"],
             $datos["foto"],
             $datos["certAntPoliciales"]

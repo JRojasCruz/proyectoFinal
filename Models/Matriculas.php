@@ -35,7 +35,7 @@ class Matriculados{
     }
     public function registrarMatricula($datos = []){
       try{
-        $consulta = $this->access->prepare("CALL spu_registrar_matricula(?,?,?,?,?,?,?,?)");
+        $consulta = $this->access->prepare("CALL spu_registrar_matricula(?,?,?,?,?,?,?,?, @p_result)");
         $consulta->execute(
           array(
             $datos["nombres"],
@@ -48,13 +48,27 @@ class Matriculados{
             $datos["idMetodoPago"]
           )
         );
-        return true;
+    
+        // Obtener el valor de salida p_result
+        $resultado = $this->access->query("SELECT @p_result")->fetch(PDO::FETCH_COLUMN);
+    
+        if ($resultado == 0) {
+          // La matrícula se registró correctamente
+          return true;
+        } elseif ($resultado == 1) {
+          // La persona ha alcanzado el límite de carreras permitidas
+          return -1;
+        } else {
+          // Otro tipo de error ocurrió
+          return false;
+        }
       }
       catch(Exception $e){
-        //Manejar el error según criterio...
+        // Manejar el error según criterio...
         return false;
       }
     }
+    
     public function buscarPostulante($numDocumento){
       try{
         $consulta = $this->access->prepare("CALL spu_buscar_postulante(?)");
@@ -64,10 +78,10 @@ class Matriculados{
         die($e->getMessage());
       }
     }
-    public function eliminarMatricula($numDocumento){
+    public function eliminarMatricula($idMatricula){
       try{
-        $consulta = $this->access->prepare("CALL spu_eliminar_matricual(?)");
-        $consulta->execute(array(($numDocumento)));
+        $consulta = $this->access->prepare("CALL spu_eliminar_matricula(?)");
+        $consulta->execute(array(($idMatricula)));
         return $consulta->fetch(PDO::FETCH_ASSOC);
       }catch(Exception $e){
         die($e->getMessage());

@@ -8,11 +8,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const email = document.getElementById("r-email");
   const btRegistrar = document.getElementById("btnRegistrarMatricula");
   const btBuscarPostulante = document.getElementById("btnBuscarPostulante");
-  const btBuscarEliminarPostulante = document.getElementById("em-buscarPostulante");
+  const btBuscarEliminarPostulante = document.getElementById(
+    "em-buscarPostulante"
+  );
   const btAdjuntarRequisitos = document.getElementById("btnAdjuntarRequisitos");
   const btnProcesarPago = document.getElementById("btnProcesarPago");
   const btEliminarMatricula = document.getElementById("btnEliminarMatricula");
   let numDocumentoPago = null;
+  let idMatricula = null;
+  let requisitos = null;
   const arnumDoc = document.getElementById("ar-numdocumento");
   const arPostulante = document.getElementById("ar-postulante");
   const emnumDoc = document.getElementById("em-nrodocumento");
@@ -32,8 +36,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalRequisitos = new bootstrap.Modal(
     document.getElementById("modalRequisitos")
   );
-  const modalEliminar = new bootstrap.Modal(document.getElementById("modalEliminar"));
-  const modalPago = new bootstrap.Modal(document.getElementById("modalPago"));
+  const modalEliminar = new bootstrap.Modal(
+    document.getElementById("modalEliminar")
+  );
+  const modalPago = new bootstrap.Modal(
+    document.getElementById("modalPago")
+    );
 
   function obtenerMatriculados() {
     const data = new URLSearchParams(); //Permite manipular y extraer información de los parametros de una url
@@ -52,8 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
             element.fotoEstado,
             element.certAntPolicialesEstado,
           ].every((estado) => estado == "Recibido");
-          const validarEstadoPago = element.estadoPago !== "Cancelado" && validarEstados;
-          console.log(validarEstadoPago)
+          const validarEstadoPago =
+            element.estadoPago !== "Cancelado" && validarEstados;
           //Iteramos sobre los datos y generamos una fila en la tabla por cada elemento en datos
           let fila = `
       <tr>
@@ -66,9 +74,11 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${element.estado}</td>
         <td>${element.estadoPago}</td>
         <td>
-          <button><i class="bi bi-trash"></i></button>
-          <button><i class="bi bi-file-earmark-zip"></i></button>
-          <button class="cambiar-estado" data-dni='${element.nroDocumento}' ${!validarEstadoPago ? "disabled" : ""}><i class="bi bi-currency-dollar"></i></button>
+          <button class="eliminar-matricula" data-matricula=${element.idMatricula}><i class="bi bi-trash"></i></button>
+          <button class="adjuntar-requisitos" data-requisitos=${element.idMatricula}><i class="bi bi-file-earmark-zip"></i></button>
+          <button class="cambiar-estado" data-dni='${element.nroDocumento}' ${
+            !validarEstadoPago ? "disabled" : ""
+          }><i class="bi bi-currency-dollar" ></i></button>
           </td>
         </tr>
         
@@ -78,15 +88,27 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
   tablaMatriculados.addEventListener("click", (e) => {
+    
     const btCambiarEstado = e.target.closest(".cambiar-estado");
-
+    const btEliminar = e.target.closest(".eliminar-matricula")
+    const btRequisitos = e.target.closest(".adjuntar-requisitos");
+    
     if (btCambiarEstado) {
       console.log(btCambiarEstado.disabled);
       if (!btCambiarEstado.disabled) {
         modalPago.toggle();
         numDocumentoPago = btCambiarEstado.dataset.dni;
-        console.log(numDocumentoPago);
       }
+    }
+    if (btEliminar) {
+      console.log(btEliminar.dataset.matricula)
+      modalEliminar.toggle();
+      idMatricula = btEliminar.dataset.matricula;
+    }
+    if (btRequisitos) {
+      console.log(btRequisitos.dataset.requisitos)
+      modalRequisitos.toggle();
+      requisitos = btRequisitos.dataset.requisitos;
     }
   });
   function obtenerCarreras() {
@@ -167,43 +189,33 @@ document.addEventListener("DOMContentLoaded", () => {
       fd.append("r-email", email.value);
       fd.append("r-carreras", listarCarreras.value);
       fd.append("r-metodopago", listarMetodoPago.value);
-      // Verificar los datos recopilados antes de enviar la solicitud
-      // for (const pair of fd.entries()) {
-      //   console.log(pair[0] + ": " + pair[1]);
-      // }
+
       fetch("../Controllers/Matriculas.Controller.php", {
         method: "POST",
         body: fd,
       })
         .then((res) => res.json())
         .then((data) => {
-          if (data.status) {
-            //Si status es true, se registro exitosamente
+          console.log(data)
+          if (data.errorCode === 1) {
+            // La persona ha alcanzado el límite de carreras permitidas
+            alert("La persona ha alcanzado el límite de carreras permitidas.");
+          } else if (data.errorCode===0) {
+            // La matrícula se registró exitosamente
             formRegistrar.reset(); // se reinicia el formulario
-            modalRegistrar.toggle(); //se cierra el modal
-            obtenerMatriculados(); //Se recarga la tabla
+            modalRegistrar.toggle(); // se cierra el modal
+            obtenerMatriculados(); // se recarga la tabla
+            alert("Matrícula registrada exitosamente.");
           } else {
-            //Error detectado
-            console.log(error);
+            // Error detectado
+            alert("Error al registrar la matrícula.");
           }
         })
         .catch((error) => {
           console.error("Error:", error);
+          alert("Error en la solicitud.");
         });
     }
-  }
-  function buscarPostulante(dni,input) {
-    const data = new URLSearchParams();
-    data.append("operacion", "buscarPostulante");
-    data.append("ar-numdocumento", dni);
-    fetch("../Controllers/Matriculas.Controller.php", {
-      method: "POST",
-      body: data,
-    })
-      .then((res) => res.json())
-      .then((datos) => {
-        input.value = datos.nombres + " " + datos.apellidos;
-      });
   }
   function validarFormularioRequisitos() {
     const arCertestudiosValue = arCertestudios.value;
@@ -222,7 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const data = new FormData();
     data.append("operacion", "adjuntarRequisitos");
-    data.append("ar-numdocumento", arnumDoc.value);
+    data.append("idMatricula", requisitos);
     data.append("ar-certestudios", arCertestudios.files[0]);
     data.append("ar-foto", arFoto.files[0]);
     data.append("ar-antpoliciales", antPoliciales.files[0]);
@@ -233,6 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((res) => res.json())
       .then((datos) => {
         if (datos.status) {
+          alert("Datos adjuntados correctamente")
           formAdjuntarRequisitos.reset();
           modalRequisitos.toggle();
           obtenerMatriculados();
@@ -245,21 +258,19 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
   function eliminarMatricula() {
-    if(confirm("¿Estás seguro de eliminar ésta matrícula?")){
-    const data = new URLSearchParams();
-    data.append("operacion", "eliminarMatricula");
-    data.append("em-numdocumento", emnumDoc.value);
-    fetch("../Controllers/Matriculas.Controller.php", {
-      method: "POST",
-      body: data,
-    })
-      .then((res) => res.json())
-      .then((datos) => {
-        console.log(datos)
-        formEliminarMatricula.reset();
-        obtenerMatriculados();
-        modalEliminar.toggle();
-      });
+    if (confirm("¿Estás seguro de eliminar ésta matrícula?")) {
+      const data = new URLSearchParams();
+      data.append("operacion", "eliminarMatricula");
+      data.append("idMatricula", idMatricula);
+      fetch("../Controllers/Matriculas.Controller.php", {
+        method: "POST",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((datos) => {
+          obtenerMatriculados();
+          modalEliminar.toggle();
+        });
     }
   }
 
@@ -280,12 +291,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   btRegistrar.addEventListener("click", registrarMatricula);
-  btBuscarPostulante.addEventListener("click", ()=>{
-    buscarPostulante(arnumDoc.value,arPostulante);
-  });
-  btBuscarEliminarPostulante.addEventListener("click",()=>{
-    buscarPostulante(emnumDoc.value,emPostulante);
-  });
   btAdjuntarRequisitos.addEventListener("click", adjuntarRequisitos);
   btnProcesarPago.addEventListener("click", pagar);
   btEliminarMatricula.addEventListener("click", eliminarMatricula);

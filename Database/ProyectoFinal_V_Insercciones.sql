@@ -15,13 +15,8 @@ VALUES	('Jesus','Rojas', 'DNI','74036049','902336311','jesus.rojas.cm@gmail.com'
 		('Alejandro', 'Torres', 'DNI', '96325874', '666666666', 'alejandro@example.com'),
 		('Sofía', 'Pérez', 'DNI', '25896314', '333333333', 'sofia@example.com');
         
-SELECT * FROM personas;
--- Inserción de Usuarios
 INSERT INTO Usuarios (idpersona, nombreUsuario, claveAcceso,rol)
 VALUES ('1','JESUS','$2y$10$jtjzJBlRRzKmcQ5YZGCTxemKXLEtI7Bxe96XeogoNXdL4jxsZOCEW','Admin');
-
-SELECT * FROM usuarios;
-
 -- Insercion de Carreras
 INSERT INTO Carrera		(nombreCarrera, descripcion, precioInscripcion, duracion,semestres,cuotasPorSemestre,precioPorCuota)
 			VALUES 	('Ingeniería de Software', 'El profesional técnico en Ingenieria de Software con Inteligencia Artificial está capacitado,para aplicar principios, técnicas, herramientas y métodos para el diseño, desarrollo, implementación, mantenimiento ,y gestión de sistemas de información con Inteligencia Artificial', 450, '3 años',6,4,308),
@@ -37,21 +32,18 @@ INSERT INTO Carrera		(nombreCarrera, descripcion, precioInscripcion, duracion,se
 						('Enfermería', 'Atención y cuidado de pacientes, promoción de la salud y prevención de enfermedades en distintos entornos de atención médica.', 600, '5 años', 10, 8, 550),
 						('Comunicación Social', 'Estudio de los procesos de comunicación y medios de difusión, abordando la creación y gestión de contenidos en diferentes plataformas.', 500, '4 años', 8, 6, 450);
 
-SELECT * FROM Carrera;
 -- Inserción de Postulantes
 INSERT INTO Postulante (idPersona, idCarrera) 
 		VALUES 	(2,1),
-					(3,2),
-               (4,3),
-               (5,4),
-               (6,5),
-               (7,6),
-               (8,7),
-               (9,8),
-               (10,9);
+				(3,2),
+				(4,3),
+				(5,4),
+				(6,5),
+				(7,6),
+				(8,7),
+				(9,8),
+				(10,9);
                 
-SELECT * FROM Postulante;
-
 INSERT INTO Matricula 	(idPostulante, fechaMatricula)
 			VALUES 		(1,NOW()),
 							(2,NOW()),
@@ -62,14 +54,13 @@ INSERT INTO Matricula 	(idPostulante, fechaMatricula)
 							(7,NOW()),
 							(8,NOW()),
 							(9,NOW());
-SELECT * FROM Matricula;
 
 INSERT INTO MetodoPago (idMetodoPago, metodoPago)
 VALUES (1, 'Yape'),
        (2, 'Efectivo'),
        (3, 'Plin'),
        (4, 'Transferencia');
-SELECT * FROM metodopago;
+
 INSERT INTO Pagos(idMatricula,idMetodoPago)
 			VALUES		(1,1),
 							(2,3),
@@ -80,5 +71,4 @@ INSERT INTO Pagos(idMatricula,idMetodoPago)
 							(7,3),
 							(8,1),
 							(9,2);
-SELECT * FROM Pagos;
 
