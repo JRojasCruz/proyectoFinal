@@ -1,7 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
   const listCarreras = document.querySelector("#listaCarreras");
+  const listCarrerasPdf2 = document.querySelector("#listaCarrerasPdf2");
   const tbFiltroCarreras = document.querySelector("#tbReporte1 tbody");
   const btExportarPDF = document.getElementById("exportPDF");
+  const btFiltro = document.getElementById("filtro");
+  const btExportPdf = document.getElementById("exportPDF2");
   function obtenerCarreras() {
     const data = new URLSearchParams();
     data.append("operacion", "listarCarreras");
@@ -54,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("No se encontraron datos");
       });
   }
+
   function generatePDF() {
     const pm = new URLSearchParams();
     pm.append("idCarrera", parseInt(listCarreras.value));

@@ -69,8 +69,10 @@ BEGIN
     DECLARE p_idMatricula INT;
     DECLARE p_result INT;
     DECLARE p_resultExists INT;
+
     -- Verificar si la persona ya existe en la tabla Personas
     SELECT idPersona INTO p_idPersona FROM Personas WHERE nroDocumento = p_nroDocumento LIMIT 1;
+
     IF p_idPersona IS NULL THEN
         -- La persona no existe, insertar en la tabla Personas
         INSERT INTO Personas (nombres, apellidos, tipoDocumento, nroDocumento, nroCelular, email)
@@ -78,31 +80,40 @@ BEGIN
 
         SET p_idPersona = LAST_INSERT_ID();
     END IF;
+
     -- Verificar si la persona ha alcanzado el límite de carreras permitidas
-    SELECT COUNT(*) INTO p_result FROM Postulante WHERE idPersona = p_idPersona AND estado='Activo';
+    SELECT COUNT(*) INTO p_result FROM Postulante WHERE idPersona = p_idPersona AND estado = 'Activo';
+
     IF p_result < 2 THEN
-    -- Verificar si la persona ya esta matricula en una misma carrera
-    SELECT COUNT(*) INTO p_resultExists FROM matricula
-		INNER JOIN postulante on postulante.idPostulante = matricula.idPostulante
-		INNER JOIN personas on personas.idPersona = postulante.idPersona
-		WHERE personas.nroDocumento = p_nroDocumento AND postulante.idCarrera = p_idCarrera AND matricula.estado='Pendiente';
+        -- Verificar si la persona ya está matriculada en la misma carrera
+        SELECT COUNT(*) INTO p_resultExists FROM Matricula
+            INNER JOIN Postulante ON Postulante.idPostulante = Matricula.idPostulante
+            INNER JOIN Personas ON Personas.idPersona = Postulante.idPersona
+            WHERE Personas.nroDocumento = p_nroDocumento AND Postulante.idCarrera = p_idCarrera AND Matricula.estado = 'Pendiente';
+
         IF p_resultExists < 1 THEN
-        -- Insertar en la tabla Postulante
-        INSERT INTO Postulante (idPersona, idCarrera, fechaPostulacion)
-        VALUES (p_idPersona, p_idCarrera, NOW());
-        SET p_idPostulante = LAST_INSERT_ID();
-        -- Insertar en la tabla Matricula
-        INSERT INTO Matricula (idPostulante, fechaMatricula)
-        VALUES (p_idPostulante, NOW());
-        SET p_idMatricula = LAST_INSERT_ID();
-        -- Insertar en la tabla Pagos
-        INSERT INTO Pagos (idMatricula, metodoPago, estadoPago)
-        VALUES (p_idMatricula, p_MetodoPago, 'Pendiente');
-		END IF;
+            -- Insertar en la tabla Postulante
+            INSERT INTO Postulante (idPersona, idCarrera, fechaPostulacion)
+            VALUES (p_idPersona, p_idCarrera, NOW());
+
+            SET p_idPostulante = LAST_INSERT_ID();
+
+            -- Insertar en la tabla Matricula
+            INSERT INTO Matricula (idPostulante, fechaMatricula)
+            VALUES (p_idPostulante, NOW());
+
+            SET p_idMatricula = LAST_INSERT_ID();
+
+            -- Insertar en la tabla Pagos
+            INSERT INTO Pagos (idMatricula, metodoPago, estadoPago)
+            VALUES (p_idMatricula, p_MetodoPago, 'Pendiente');
+        END IF;
     END IF;
+
     SELECT p_result;
 END $$
 DELIMITER ;
+
 -- CALL spu_registrar_matricula('Carlos','Moran','DNI','98765400','951222666','moran@gmail.com',1,'Plin');
 
 -- PROCEDIMIENTO PARA ACTULIZAR LOS REQUISITOS Y SUS ESTADOS
@@ -134,11 +145,19 @@ BEGIN
     DECLARE uno CHAR(9);
     DECLARE dos CHAR(9);
     DECLARE tres CHAR(9);
+    DECLARE montoPagado INT;
 
     SELECT certEstudiosEstado, fotoEstado, certAntPolicialesEstado
     INTO uno, dos, tres
     FROM Matricula
     INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
+    INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
+    WHERE Personas.nroDocumento = p_nroDocumento;
+
+    -- Obtener el precio de la inscripción de la tabla Carrera
+    SELECT precioInscripcion INTO montoPagado
+    FROM Carrera
+    INNER JOIN Postulante ON Carrera.idCarrera = Postulante.idCarrera
     INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
     WHERE Personas.nroDocumento = p_nroDocumento;
 
@@ -148,7 +167,8 @@ BEGIN
         INNER JOIN Postulante ON Matricula.idPostulante = Postulante.idPostulante
         INNER JOIN Personas ON Postulante.idPersona = Personas.idPersona
         SET Pagos.estadoPago = 'Cancelado',
-            Pagos.fechaPago = NOW()
+            Pagos.fechaPago = NOW(),
+            Pagos.montoPagado = montoPagado
         WHERE Personas.nroDocumento = p_nroDocumento;
 
         IF ROW_COUNT() > 0 THEN
@@ -185,3 +205,66 @@ BEGIN
 		WHERE carrera.idCarrera = _idCarrera
 		ORDER BY personas.nombres;
 END$$
+-- REPORTES PDF 2
+
+DROP PROCEDURE IF EXISTS spu_obtener_pagos_carrera_metodo;
+DELIMITER $$
+CREATE PROCEDURE spu_obtener_pagos_carrera_metodo(
+    IN p_idCarrera INT,
+    IN p_metodoPago CHAR(15)
+)
+BEGIN
+    SELECT c.idCarrera, p.nombres, p.apellidos, c.nombreCarrera, pg.estadoPago, pg.metodoPago
+    FROM Matricula m
+    INNER JOIN Postulante po ON po.idPostulante = m.idPostulante
+    INNER JOIN Personas p ON p.idPersona = po.idPersona
+    INNER JOIN Carrera c ON c.idCarrera = po.idCarrera
+    INNER JOIN Pagos pg ON pg.idMatricula = m.idMatricula
+    WHERE c.idCarrera = p_idCarrera AND pg.metodoPago = p_metodoPago
+    GROUP BY c.idCarrera, p.nombres, p.apellidos, c.nombreCarrera, pg.estadoPago, pg.metodoPago;
+END$$
+DELIMITER ;
+
+CALL spu_obtener_pagos_carrera_metodo(1, 'Efectivo');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT p.idPago, c.nombreCarrera, p.estadoPago, c.precioInscripcion,
+  SUM(CASE WHEN p.estadoPago = 'Pendiente' THEN p.montoPagado ELSE 0 END) AS cantidadFaltante,
+  SUM(CASE WHEN p.estadoPago = 'Cancelado' THEN p.montoPagado ELSE 0 END) AS cantidadPagada
+FROM Pagos p
+INNER JOIN Matricula m ON p.idMatricula = m.idMatricula
+INNER JOIN Postulante po ON m.idPostulante = po.idPostulante
+INNER JOIN Carrera c ON po.idCarrera = c.idCarrera
+WHERE p.estadoPago = 'Pendiente' -- Cambia 'Pendiente' por 'Cancelado' para mostrar los registros cancelados
+GROUP BY p.idPago, c.nombreCarrera, p.estadoPago, c.precioInscripcion;
+
+SELECT p.idPago, c.nombreCarrera, p.estadoPago, c.precioInscripcion, p.montoPagado
+FROM Pagos p
+INNER JOIN Matricula m ON p.idMatricula = m.idMatricula
+INNER JOIN Postulante po ON m.idPostulante = po.idPostulante
+INNER JOIN Carrera c ON po.idCarrera = c.idCarrera
+WHERE p.estadoPago IN ('Pendiente', 'Cancelado') -- Aquí puedes especificar los estados deseados, por ejemplo: 'Pendiente', 'Cancelado'
+
+
+

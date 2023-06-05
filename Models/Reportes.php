@@ -15,5 +15,14 @@ class Reportes{
         die($e->getMessage());
       }
     }
+    public function listarPorMetodoPago($carrera, $metodopago){
+      try{
+        $consulta = $this->access->prepare("CALL spu_obtener_pagos_carrera_metodo(?,?)");
+        $consulta->execute(array($carrera,$metodopago));
+        return $consulta->fetchall(PDO::FETCH_ASSOC);
+      }catch(Exception $e){
+        die($e->getMessage());
+      }
+    }
   }
   ?>

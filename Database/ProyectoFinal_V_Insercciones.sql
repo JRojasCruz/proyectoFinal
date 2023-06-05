@@ -31,7 +31,7 @@ INSERT INTO Carrera		(nombreCarrera, descripcion, precioInscripcion, duracion,se
 						('Marketing', 'Planificación y ejecución de estrategias de marketing para promover productos y servicios, analizando el comportamiento del consumidor.', 550, '4 años', 8, 6, 500),
 						('Enfermería', 'Atención y cuidado de pacientes, promoción de la salud y prevención de enfermedades en distintos entornos de atención médica.', 600, '5 años', 10, 8, 550),
 						('Comunicación Social', 'Estudio de los procesos de comunicación y medios de difusión, abordando la creación y gestión de contenidos en diferentes plataformas.', 500, '4 años', 8, 6, 450);
-
+select * from carrera;
 -- Inserción de Postulantes
 INSERT INTO Postulante (idPersona, idCarrera) 
 		VALUES 	(2,1),
@@ -54,7 +54,7 @@ INSERT INTO Matricula 	(idPostulante, fechaMatricula)
 							(7,NOW()),
 							(8,NOW()),
 							(9,NOW());
-
+select * from Matricula;
 INSERT INTO Pagos(idMatricula,metodoPago)
 			VALUES		(1,'Efectivo'),
 						(2,'Yape'),

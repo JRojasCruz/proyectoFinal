@@ -102,11 +102,11 @@
         </div>
         <div class="card-body">
           <div class="row">
-            <div class="col-md-9">
+            <div class="col-md-4">
               <div class="form-floating">
                 <select
-                  name="listaCarreras"
-                  id="listaCarreras"
+                  name="listaCarrerasPdf2"
+                  id="listaCarrerasPdf2"
                   class="form-select"
                 >
                   <option value="">--Selecciona--</option>
@@ -114,12 +114,35 @@
                 <label for="filtrarCarrera">Filtrar por carreras</label>
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
+              <div class="form-floating">
+                <select
+                  name="metodopago"
+                  id="metodopago"
+                  class="form-select"
+                >
+                  <option value="">--Selecciona--</option>
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Yape">Yape</option>
+                  <option value="Plin">Plin</option>
+                  <option value="Transferencia">Transferencia</option>
+                </select>
+                <label for="filtrarCarrera">Filtrar por metodo de pago</label>
+              </div>
+            </div>
+            <div class="col-md-4">
               <div class="d-grid">
+              <button
+                  type="button"
+                  class="btn btn-dark text-light mb-1"
+                  id="filtro"
+                >
+                  Aplicar Filtro
+                </button>
                 <button
                   type="button"
                   class="btn btn-dark text-light"
-                  id="exportPDF"
+                  id="exportPDF2"
                 >
                   Exportar archivo PDF
                 </button>
@@ -130,14 +153,14 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <table id="tbReporte1" class="table table-sm table-striped">
+          <table id="tbReporte2" class="table table-sm table-striped">
             <thead class="bg-dark text-light">
               <tr>
                 <th>ID</th>
-                <th>Carrera</th>
                 <th>Datos del postulante</th>
-                <th>Estado matrícula</th>
-                <th>Pago de la matrícula</th>
+                <th>Carrera</th>
+                <th>Estado pago</th>
+                <th>Metodo de pago</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -145,7 +168,7 @@
         </div>
       </div>
     </div>
-    <script src="../Js/Reportes.js"></script>
+    <script src="../Js/Report2.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
