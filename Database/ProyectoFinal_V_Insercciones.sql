@@ -43,7 +43,7 @@ INSERT INTO Postulante (idPersona, idCarrera)
 				(8,7),
 				(9,8),
 				(10,9);
-                
+select * from personas;                
 INSERT INTO Matricula 	(idPostulante, fechaMatricula)
 			VALUES 		(1,NOW()),
 							(2,NOW()),
@@ -55,20 +55,14 @@ INSERT INTO Matricula 	(idPostulante, fechaMatricula)
 							(8,NOW()),
 							(9,NOW());
 
-INSERT INTO MetodoPago (idMetodoPago, metodoPago)
-VALUES (1, 'Yape'),
-       (2, 'Efectivo'),
-       (3, 'Plin'),
-       (4, 'Transferencia');
-
-INSERT INTO Pagos(idMatricula,idMetodoPago)
-			VALUES		(1,1),
-							(2,3),
-							(3,2),
-							(4,3),
-							(5,1),
-							(6,4),
-							(7,3),
-							(8,1),
-							(9,2);
+INSERT INTO Pagos(idMatricula,metodoPago)
+			VALUES		(1,'Efectivo'),
+						(2,'Yape'),
+						(3,'Plin'),
+						(4,'Transferencia'),
+						(5,'Plin'),
+						(6,'Efectivo'),
+						(7,'Transferencia'),
+						(8,'Yape'),
+						(9,'Yape');
 

@@ -24,18 +24,9 @@ class Matriculados{
         die($e->getMessage());
       }
     }
-    public function listarMetodoPago(){
-      try{
-        $consulta = $this->access->prepare("SELECT * FROM MetodoPago");
-        $consulta->execute();
-        return $consulta->fetchall(PDO::FETCH_ASSOC);
-      }catch(Exception $e){
-        die($e->getMessage());
-      }
-    }
     public function registrarMatricula($datos = []){
       try{
-        $consulta = $this->access->prepare("CALL spu_registrar_matricula(?,?,?,?,?,?,?,?, @p_result)");
+        $consulta = $this->access->prepare("CALL spu_registrar_matricula(?,?,?,?,?,?,?,?)");
         $consulta->execute(
           array(
             $datos["nombres"],
@@ -45,36 +36,26 @@ class Matriculados{
             $datos["nroCelular"],
             $datos["email"],
             $datos["idCarrera"],
-            $datos["idMetodoPago"]
+            $datos["metodoPago"]
           )
         );
     
         // Obtener el valor de salida p_result
-        $resultado = $this->access->query("SELECT @p_result")->fetch(PDO::FETCH_COLUMN);
+        $resultado = $consulta->fetch(PDO::FETCH_ASSOC);
     
-        if ($resultado == 0) {
+        if ($resultado['p_result'] <= 1) {
           // La matrícula se registró correctamente
-          return true;
-        } elseif ($resultado == 1) {
+          return 0;
+        } elseif ($resultado['p_result'] == 2) {
           // La persona ha alcanzado el límite de carreras permitidas
-          return -1;
+          return 1;
         } else {
           // Otro tipo de error ocurrió
-          return false;
+          return -1;
         }
       }
       catch(Exception $e){
         // Manejar el error según criterio...
-        return false;
-      }
-    }
-    
-    public function buscarPostulante($numDocumento){
-      try{
-        $consulta = $this->access->prepare("CALL spu_buscar_postulante(?)");
-        $consulta->execute(array(($numDocumento)));
-        return $consulta->fetch(PDO::FETCH_ASSOC);
-      }catch(Exception $e){
         die($e->getMessage());
       }
     }

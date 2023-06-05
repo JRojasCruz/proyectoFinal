@@ -61,7 +61,7 @@ CREATE PROCEDURE spu_registrar_matricula(
     IN p_nroCelular CHAR(9),
     IN p_email VARCHAR(70),
     IN p_idCarrera INT,
-    IN p_idMetodoPago INT
+    IN p_MetodoPago CHAR(15)
 )
 BEGIN
     DECLARE p_idPersona INT;
@@ -96,47 +96,14 @@ BEGIN
         VALUES (p_idPostulante, NOW());
         SET p_idMatricula = LAST_INSERT_ID();
         -- Insertar en la tabla Pagos
-        INSERT INTO Pagos (idMatricula, idMetodoPago, estadoPago)
-        VALUES (p_idMatricula, p_idMetodoPago, 'Pendiente');
+        INSERT INTO Pagos (idMatricula, metodoPago, estadoPago)
+        VALUES (p_idMatricula, p_MetodoPago, 'Pendiente');
 		END IF;
     END IF;
+    SELECT p_result;
 END $$
 DELIMITER ;
-
-SELECT COUNT(*) AS result FROM Postulante WHERE idPersona = 16;
-SELECT COUNT(*) AS resultMatricula FROM Postulante WHERE idPersona = 2;
-CALL spu_registrar_matricula('Carlos', 'Moran', 'DNI', '111520003', '981111111', 'carlos@gmail.com',1,4);
-select * from postulante;
-select * from personas;
-select *
-from matricula
-inner join postulante on postulante.idPostulante = matricula.idPostulante
-inner join personas on personas.idPersona = postulante.idPersona
-where personas.nroDocumento = 111520003;
-
-
-select COUNT(*) as num
-from matricula
-inner join postulante on postulante.idPostulante = matricula.idPostulante
-inner join personas on personas.idPersona = postulante.idPersona
-where personas.nroDocumento = '111520003' AND postulante.idCarrera = 10 AND matricula.estado="Invalida";
-select * from pagos;
-
-
-
--- Probar SPU
--- CALL spu_registrar_matricula('John', 'Doe', 'DNI', '1234567890', '987654321', 'john.doe@example.com',1,3);
-
--- PROCEDIMIENTO PARA BUSCAR EL POSTULANTE
-DELIMITER $$
-CREATE PROCEDURE spu_buscar_postulante(IN p_nroDocumento CHAR(12))
-BEGIN
-    SELECT p.nombres, p.apellidos
-    FROM Personas p
-    INNER JOIN Postulante po ON p.idPersona = po.idPersona
-    WHERE p.nroDocumento = p_nroDocumento;
-END$$
-DELIMITER ;
+-- CALL spu_registrar_matricula('Carlos','Moran','DNI','98765400','951222666','moran@gmail.com',1,'Plin');
 
 -- PROCEDIMIENTO PARA ACTULIZAR LOS REQUISITOS Y SUS ESTADOS
 DELIMITER $$
@@ -205,9 +172,6 @@ BEGIN
 		SET matricula.estado = 'Anulada', postulante.estado = 'Inactivo', pagos.estadoPago = 'Anulado'
 		WHERE Matricula.idMatricula = _idMatricula;
 END$$
-
-UPDATE Matricula SET estado = 'Pendiente' where idMatricula IN(15,16);
-select * from postulante;
 -- REPORTES PDF 1
 DELIMITER $$
 CREATE PROCEDURE spu_listar_matriculas_por_carrera(IN _idCarrera INT)
@@ -221,47 +185,3 @@ BEGIN
 		WHERE carrera.idCarrera = _idCarrera
 		ORDER BY personas.nombres;
 END$$
--- Probar SPU
-CALL spu_procesar_pago('98765432');
-CALL spu_eliminar_matricual('85296374');
-SELECT * FROM postulante;
-SELECT * FROM matricula;
-SELECT * FROM Pagos;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--- Procedimiento para mostrar al postulante y su carrera
-	SELECT 	postulante.idPostulante, personas.nombres, personas.apellidos,
-			personas.tipoDocumento, personas.nroDocumento, personas.nroCelular,
-            carrera.nombreCarrera
-            FROM postulante
-            INNER JOIN personas ON personas.idPersona = postulante.idPostulante
-            INNER JOIN carrera ON carrera.idCarrera = postulante.idCarrera;
--- Procedimiento para mostrar el estado de la matricula por Carrera

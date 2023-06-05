@@ -304,7 +304,10 @@ if (!isset($_SESSION["seguridad"]) || !$_SESSION["seguridad"]["login"]) {
                                     class="form-select"
                                   >
                                     <option value="">-- Seleccione</option>
-                                    <!-- Agrega más opciones de carrera aquí -->
+                                    <option value="Efectivo">Efectivo</option>
+                                    <option value="Yape">Yape</option>
+                                    <option value="Plin">Plin</option>
+                                    <option value="Transferencia">Transferencia</option>
                                   </select>
                                 </div>
                               </div>

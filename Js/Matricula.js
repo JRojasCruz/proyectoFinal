@@ -7,25 +7,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const numCelular = document.getElementById("r-numcel");
   const email = document.getElementById("r-email");
   const btRegistrar = document.getElementById("btnRegistrarMatricula");
-  const btBuscarPostulante = document.getElementById("btnBuscarPostulante");
-  const btBuscarEliminarPostulante = document.getElementById(
-    "em-buscarPostulante"
-  );
   const btAdjuntarRequisitos = document.getElementById("btnAdjuntarRequisitos");
   const btnProcesarPago = document.getElementById("btnProcesarPago");
   const btEliminarMatricula = document.getElementById("btnEliminarMatricula");
   let numDocumentoPago = null;
   let idMatricula = null;
   let requisitos = null;
-  const arnumDoc = document.getElementById("ar-numdocumento");
-  const arPostulante = document.getElementById("ar-postulante");
-  const emnumDoc = document.getElementById("em-nrodocumento");
-  const emPostulante = document.getElementById("em-Postulante");
   const arCertestudios = document.getElementById("ar-certestudios");
   const arFoto = document.getElementById("ar-foto");
   const antPoliciales = document.getElementById("ar-antpoliciales");
   const listarCarreras = document.querySelector("#r-carreras");
-  const listarMetodoPago = document.querySelector("#r-metodopago");
   const formRegistrar = document.getElementById("formRegistrarMatricula");
   const formAdjuntarRequisitos = document.getElementById(
     "formAdjuntarRequisitos"
@@ -128,23 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
   }
-  function obtenerMetodoPago() {
-    const data = new URLSearchParams();
-    data.append("operacion", "listarMetodoPago");
-    fetch("../Controllers/Matriculas.Controller.php", {
-      method: "POST",
-      body: data,
-    })
-      .then((res) => res.json())
-      .then((datos) => {
-        datos.forEach((element) => {
-          const optionTag = document.createElement("option");
-          optionTag.value = element.idMetodoPago;
-          optionTag.text = element.metodoPago;
-          listarMetodoPago.appendChild(optionTag);
-        });
-      });
-  }
   function validarFormulario() {
     // Obtener los valores de los campos del formulario
     const nombresvalue = nombres.value;
@@ -154,7 +128,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const numCelularvalue = numCelular.value;
     const emailvalue = email.value;
     const carrerasvalue = listarCarreras.value;
-    const metodopagovalue = listarMetodoPago.value;
 
     // Realizar validaciones
     if (
@@ -164,8 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
       !numDocumentovalue ||
       !numCelularvalue ||
       !emailvalue ||
-      !carrerasvalue ||
-      !metodopagovalue
+      !carrerasvalue
     ) {
       // Verificar que todos los campos estén completos
       alert("Por favor, complete todos los campos del formulario.");
@@ -188,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fd.append("r-numcel", numCelular.value);
       fd.append("r-email", email.value);
       fd.append("r-carreras", listarCarreras.value);
-      fd.append("r-metodopago", listarMetodoPago.value);
+      fd.append("r-metodopago",document.querySelector("#r-metodopago").value);
 
       fetch("../Controllers/Matriculas.Controller.php", {
         method: "POST",
@@ -197,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((res) => res.json())
         .then((data) => {
           console.log(data)
-          if (data.errorCode === 1) {
+          if (data.errorCode===1) {
             // La persona ha alcanzado el límite de carreras permitidas
             alert("La persona ha alcanzado el límite de carreras permitidas.");
           } else if (data.errorCode===0) {
@@ -273,7 +245,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
   }
-
   function pagar() {
     const data = new FormData();
     data.append("operacion", "procesarPago");
@@ -297,5 +268,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   obtenerMatriculados();
   obtenerCarreras();
-  obtenerMetodoPago();
 });
